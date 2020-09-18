@@ -16,6 +16,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import com.wireguard.android.backend.Backend
+import com.wireguard.android.backend.BackendFactory
 import com.wireguard.android.backend.GoBackend
 import com.wireguard.android.backend.WgQuickBackend
 import com.wireguard.android.configStore.FileConfigStore
@@ -59,31 +60,12 @@ class Application : android.app.Application(), OnSharedPreferenceChangeListener 
     }
 
     private fun determineBackend(): Backend {
-        var backend: Backend? = null
-        var didStartRootShell = false
-        if (!ModuleLoader.isModuleLoaded() && moduleLoader.moduleMightExist()) {
-            try {
-                rootShell.start()
-                didStartRootShell = true
-                moduleLoader.loadModule()
-            } catch (ignored: Exception) {
-            }
-        }
-        if (!sharedPreferences.getBoolean("disable_kernel_module", false) && ModuleLoader.isModuleLoaded()) {
-            try {
-                if (!didStartRootShell)
-                    rootShell.start()
-                val wgQuickBackend = WgQuickBackend(applicationContext, rootShell, toolsInstaller)
-                wgQuickBackend.setMultipleTunnels(sharedPreferences.getBoolean("multiple_tunnels", false))
-                backend = wgQuickBackend
-            } catch (ignored: Exception) {
-            }
-        }
-        if (backend == null) {
-            backend = GoBackend(applicationContext)
-            GoBackend.setAlwaysOnCallback { get().tunnelManager.restoreState(true) }
-        }
-        return backend
+        var flags = 0
+        if (sharedPreferences.getBoolean("disable_kernel_module", false))
+            flags = flags or BackendFactory.DISABLE_KERNEL_BACKEND
+        if (!sharedPreferences.getBoolean("multiple_tunnels", false))
+            flags = flags or BackendFactory.DISABLE_MULTIPLE_TUNNELS
+        return BackendFactory.make(flags, applicationContext, rootShell, toolsInstaller, moduleLoader) { get().tunnelManager.restoreState(true) }
     }
 
     override fun onCreate() {
