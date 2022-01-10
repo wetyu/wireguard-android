@@ -1,4 +1,6 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+}
 
 version wireguardVersionName
 group groupName
@@ -19,9 +21,6 @@ android {
         cmake {
             path 'tools/CMakeLists.txt'
         }
-    }
-    libraryVariants.all {
-        it.generateBuildConfigProvider.configure { enabled = false }
     }
     testOptions.unitTests.all {
         testLogging {
@@ -53,7 +52,7 @@ android {
 dependencies {
     implementation "androidx.annotation:annotation:$annotationsVersion"
     implementation "androidx.collection:collection:$collectionVersion"
-    implementation "com.google.code.findbugs:jsr305:$jsr305Version"
+    compileOnly "com.google.code.findbugs:jsr305:$jsr305Version"
     testImplementation "junit:junit:$junitVersion"
 }
 

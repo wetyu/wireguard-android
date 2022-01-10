@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -114,7 +114,7 @@ class LogViewerActivity : AppCompatActivity() {
             val key = KeyPair().privateKey.toHex()
             LOGS[key] = rawLogLines.toString().toByteArray(Charsets.UTF_8)
             lastUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.exported-log/$key")
-            val shareIntent = ShareCompat.IntentBuilder.from(this)
+            val shareIntent = ShareCompat.IntentBuilder(this)
                     .setType("text/plain")
                     .setSubject(getString(R.string.log_export_subject))
                     .setStream(lastUri)
@@ -126,9 +126,9 @@ class LogViewerActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.log_viewer, menu)
-        saveButton = menu?.findItem(R.id.save_log)
+        saveButton = menu.findItem(R.id.save_log)
         return true
     }
 
@@ -202,11 +202,7 @@ class LogViewerActivity : AppCompatActivity() {
                                 it.scrollToPosition(logLines.size - 1)
                         }
                     } else {
-                        /* TODO: I'd prefer for the next line to be:
-                         * logLines.lastOrNull()?.msg += "\n$line"
-                         * However, as of writing, that causes the kotlin compiler to freak out and crash, spewing bytecode.
-                         */
-                        logLines.lastOrNull()?.apply { msg += "\n$line" }
+                        logLines.lastOrNull()?.msg += "\n$line"
                         if (haveScrolled) logAdapter.notifyDataSetChanged()
                     }
                     if (!haveScrolled) {

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.activity
@@ -17,7 +17,6 @@ import com.wireguard.android.R
 import com.wireguard.android.backend.WgQuickBackend
 import com.wireguard.android.preference.PreferencesPreferenceDataStore
 import com.wireguard.android.util.AdminKnobs
-import com.wireguard.android.util.ModuleLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -79,30 +78,19 @@ class SettingsActivity : ThemeChangeAwareActivity() {
                 startActivity(Intent(requireContext(), LogViewerActivity::class.java))
                 true
             }
-            val moduleInstaller = preferenceManager.findPreference<Preference>("module_downloader")
-            val kernelModuleDisabler = preferenceManager.findPreference<Preference>("kernel_module_disabler")
-            moduleInstaller?.isVisible = false
-            if (ModuleLoader.isModuleLoaded()) {
-                moduleInstaller?.parent?.removePreference(moduleInstaller)
+            val kernelModuleEnabler = preferenceManager.findPreference<Preference>("kernel_module_enabler")
+            if (WgQuickBackend.hasKernelSupport()) {
                 lifecycleScope.launch {
                     if (Application.getBackend() !is WgQuickBackend) {
                         try {
                             withContext(Dispatchers.IO) { Application.getRootShell().start() }
                         } catch (_: Throwable) {
-                            kernelModuleDisabler?.parent?.removePreference(kernelModuleDisabler)
+                            kernelModuleEnabler?.parent?.removePreference(kernelModuleEnabler)
                         }
                     }
                 }
             } else {
-                kernelModuleDisabler?.parent?.removePreference(kernelModuleDisabler)
-                lifecycleScope.launch {
-                    try {
-                        withContext(Dispatchers.IO) { Application.getRootShell().start() }
-                        moduleInstaller?.isVisible = true
-                    } catch (_: Throwable) {
-                        moduleInstaller?.parent?.removePreference(moduleInstaller)
-                    }
-                }
+                kernelModuleEnabler?.parent?.removePreference(kernelModuleEnabler)
             }
         }
     }

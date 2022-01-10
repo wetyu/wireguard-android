@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,6 +16,7 @@ import com.wireguard.android.backend.BackendException.Reason;
 import com.wireguard.android.backend.Tunnel.State;
 import com.wireguard.android.util.SharedLibraryLoader;
 import com.wireguard.config.Config;
+import com.wireguard.config.InetEndpoint;
 import com.wireguard.config.InetNetwork;
 import com.wireguard.config.Peer;
 import com.wireguard.crypto.Key;
@@ -40,6 +41,7 @@ import androidx.collection.ArraySet;
  */
 @NonNullForAll
 public final class GoBackend implements Backend {
+    private static final int DNS_RESOLUTION_RETRIES = 10;
     private static final String TAG = "WireGuard/GoBackend";
     @Nullable private static AlwaysOnCallback alwaysOnCallback;
     private static GhettoCompletableFuture<VpnService> vpnService = new GhettoCompletableFuture<>();
@@ -68,7 +70,7 @@ public final class GoBackend implements Backend {
         alwaysOnCallback = cb;
     }
 
-    private static native String wgGetConfig(int handle);
+    @Nullable private static native String wgGetConfig(int handle);
 
     private static native int wgGetSocketV4(int handle);
 
@@ -115,10 +117,11 @@ public final class GoBackend implements Backend {
     @Override
     public Statistics getStatistics(final Tunnel tunnel) {
         final Statistics stats = new Statistics();
-        if (tunnel != currentTunnel) {
+        if (tunnel != currentTunnel || currentTunnelHandle == -1)
             return stats;
-        }
         final String config = wgGetConfig(currentTunnelHandle);
+        if (config == null)
+            return stats;
         Key key = null;
         long rx = 0;
         long tx = 0;
@@ -233,6 +236,25 @@ public final class GoBackend implements Backend {
                 return;
             }
 
+
+            dnsRetry: for (int i = 0; i < DNS_RESOLUTION_RETRIES; ++i) {
+                // Pre-resolve IPs so they're cached when building the userspace string
+                for (final Peer peer : config.getPeers()) {
+                    final InetEndpoint ep = peer.getEndpoint().orElse(null);
+                    if (ep == null)
+                        continue;
+                    if (ep.getResolved().orElse(null) == null) {
+                        if (i < DNS_RESOLUTION_RETRIES - 1) {
+                            Log.w(TAG, "DNS host \"" + ep.getHost() + "\" failed to resolve; trying again");
+                            Thread.sleep(1000);
+                            continue dnsRetry;
+                        } else
+                            throw new BackendException(Reason.DNS_RESOLUTION_FAILURE, ep.getHost());
+                    }
+                }
+                break;
+            }
+
             // Build config
             final String goConfig = config.toWgUserspaceString();
 
@@ -251,6 +273,9 @@ public final class GoBackend implements Backend {
 
             for (final InetAddress addr : config.getInterface().getDnsServers())
                 builder.addDnsServer(addr.getHostAddress());
+
+            for (final String dnsSearchDomain : config.getInterface().getDnsSearchDomains())
+                builder.addSearchDomain(dnsSearchDomain);
 
             boolean sawDefaultRoute = false;
             for (final Peer peer : config.getPeers()) {
@@ -278,7 +303,7 @@ public final class GoBackend implements Backend {
             try (final ParcelFileDescriptor tun = builder.establish()) {
                 if (tun == null)
                     throw new BackendException(Reason.TUN_CREATION_ERROR);
-                Log.d(TAG, "Go backend v" + wgVersion());
+                Log.d(TAG, "Go backend " + wgVersion());
                 currentTunnelHandle = wgTurnOn(tunnel.getName(), tun.detachFd(), goConfig);
             }
             if (currentTunnelHandle < 0)
@@ -294,11 +319,11 @@ public final class GoBackend implements Backend {
                 Log.w(TAG, "Tunnel already down");
                 return;
             }
-
-            wgTurnOff(currentTunnelHandle);
+            int handleToClose = currentTunnelHandle;
             currentTunnel = null;
             currentTunnelHandle = -1;
             currentConfig = null;
+            wgTurnOff(handleToClose);
         }
 
         tunnel.onStateChange(state);

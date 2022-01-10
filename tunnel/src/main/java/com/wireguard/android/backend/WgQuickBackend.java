@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -51,6 +51,10 @@ public final class WgQuickBackend implements Backend {
         localTemporaryDir = new File(context.getCacheDir(), "tmp");
         this.rootShell = rootShell;
         this.toolsInstaller = toolsInstaller;
+    }
+
+    public static boolean hasKernelSupport() {
+        return new File("/sys/module/wireguard").exists();
     }
 
     @Override

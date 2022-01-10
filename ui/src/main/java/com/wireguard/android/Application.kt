@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android
@@ -12,15 +12,15 @@ import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.datastore.DataStore
-import androidx.datastore.preferences.Preferences
-import androidx.datastore.preferences.createDataStore
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import com.wireguard.android.backend.Backend
 import com.wireguard.android.backend.GoBackend
 import com.wireguard.android.backend.WgQuickBackend
 import com.wireguard.android.configStore.FileConfigStore
 import com.wireguard.android.model.TunnelManager
-import com.wireguard.android.util.ModuleLoader
 import com.wireguard.android.util.RootShell
 import com.wireguard.android.util.ToolsInstaller
 import com.wireguard.android.util.UserKnobs
@@ -41,7 +41,6 @@ class Application : android.app.Application() {
     private val futureBackend = CompletableDeferred<Backend>()
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main.immediate)
     private var backend: Backend? = null
-    private lateinit var moduleLoader: ModuleLoader
     private lateinit var rootShell: RootShell
     private lateinit var preferencesDataStore: DataStore<Preferences>
     private lateinit var toolsInstaller: ToolsInstaller
@@ -66,15 +65,7 @@ class Application : android.app.Application() {
     private suspend fun determineBackend(): Backend {
         var backend: Backend? = null
         var didStartRootShell = false
-        if (!ModuleLoader.isModuleLoaded() && moduleLoader.moduleMightExist()) {
-            try {
-                rootShell.start()
-                didStartRootShell = true
-                moduleLoader.loadModule()
-            } catch (ignored: Exception) {
-            }
-        }
-        if (!UserKnobs.disableKernelModule.first() && ModuleLoader.isModuleLoaded()) {
+        if (UserKnobs.enableKernelModule.first() && WgQuickBackend.hasKernelSupport()) {
             try {
                 if (!didStartRootShell)
                     rootShell.start()
@@ -99,8 +90,7 @@ class Application : android.app.Application() {
         super.onCreate()
         rootShell = RootShell(applicationContext)
         toolsInstaller = ToolsInstaller(applicationContext, rootShell)
-        moduleLoader = ModuleLoader(applicationContext, rootShell, USER_AGENT)
-        preferencesDataStore = applicationContext.createDataStore(name = "settings")
+        preferencesDataStore = PreferenceDataStoreFactory.create { applicationContext.preferencesDataStoreFile("settings") }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             coroutineScope.launch {
                 AppCompatDelegate.setDefaultNightMode(
@@ -138,9 +128,6 @@ class Application : android.app.Application() {
 
         @JvmStatic
         suspend fun getBackend() = get().futureBackend.await()
-
-        @JvmStatic
-        fun getModuleLoader() = get().moduleLoader
 
         @JvmStatic
         fun getRootShell() = get().rootShell

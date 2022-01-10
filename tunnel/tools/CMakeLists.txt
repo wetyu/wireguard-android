@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright © 2018-2019 WireGuard LLC. All Rights Reserved.
+# Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
 
 cmake_minimum_required(VERSION 3.4.1)
+project("WireGuard")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 
 # Work around https://github.com/android-ndk/ndk/issues/602

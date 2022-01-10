@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.viewmodel
@@ -81,7 +81,7 @@ class InterfaceProxy : BaseObservable, Parcelable {
 
     constructor(other: Interface) {
         addresses = Attribute.join(other.addresses)
-        val dnsServerStrings = other.dnsServers.map { it.hostAddress }
+        val dnsServerStrings = other.dnsServers.map { it.hostAddress }.plus(other.dnsSearchDomains)
         dnsServers = Attribute.join(dnsServerStrings)
         excludedApplications.addAll(other.excludedApplications)
         includedApplications.addAll(other.includedApplications)

@@ -1,6 +1,8 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
+}
 
 version wireguardVersionName
 group groupName
@@ -10,9 +12,12 @@ group groupName
 final def keystorePropertiesFile = rootProject.file("keystore.properties")
 
 android {
-    compileSdkVersion 30
-    buildFeatures.dataBinding = true
-    buildFeatures.viewBinding = true
+    compileSdkVersion 31
+    buildFeatures {
+        buildConfig = true
+        dataBinding = true
+        viewBinding = true
+    }
     defaultConfig {
         applicationId 'com.wireguard.android'
         minSdkVersion 21
@@ -52,6 +57,8 @@ android {
     }
     lintOptions {
         disable('LongLogTag')
+        warning('MissingTranslation')
+        warning('ImpliedQuantity')
     }
 }
 
@@ -64,7 +71,6 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$coordinatorLayoutVersion"
     implementation "androidx.biometric:biometric:$biometricVersion"
     implementation "androidx.core:core-ktx:$coreKtxVersion"
-    implementation "androidx.databinding:databinding-runtime:$agpVersion"
     implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleRuntimeKtxVersion"
@@ -84,5 +90,6 @@ tasks.withType(JavaCompile) {
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
+        useIR = true
     }
 }

@@ -1,4 +1,5 @@
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 afterEvaluate {
     publishing {
@@ -35,17 +36,21 @@ afterEvaluate {
                             name = 'WireGuard'
                             url = 'https://www.wireguard.com/'
                         }
+                        developer {
+                            name = 'WireGuard'
+                            email = 'team@wireguard.com'
+                        }
                     }
                 }
             }
         }
         repositories {
             maven {
-                name = "bintray"
-                url = uri("https://api.bintray.com/maven/wireguard/wireguard-android/wireguard-android/;publish=1;override=0")
+                name = "sonatype"
+                url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
                 credentials {
-                    username = hasProperty('BINTRAY_USER') ? getProperty('BINTRAY_USER') : System.getenv('BINTRAY_USER')
-                    password = hasProperty('BINTRAY_KEY') ? getProperty('BINTRAY_KEY') : System.getenv('BINTRAY_KEY')
+                    username = hasProperty('SONATYPE_USER') ? getProperty('SONATYPE_USER') : System.getenv('SONATYPE_USER')
+                    password = hasProperty('SONATYPE_PASSWORD') ? getProperty('SONATYPE_PASSWORD') : System.getenv('SONATYPE_PASSWORD')
                 }
             }
         }
@@ -69,4 +74,9 @@ android.libraryVariants.all { variant ->
             from android.sourceSets.main.java.srcDirs
         }
     }
+}
+
+signing {
+    useGpgCmd()
+    sign publishing.publications
 }

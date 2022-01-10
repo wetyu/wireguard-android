@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.fragment
@@ -43,7 +43,7 @@ class TunnelDetailFragment : BaseFragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = TunnelDetailFragmentBinding.inflate(inflater, container, false)
         binding?.executePendingBindings()
-        return binding!!.root
+        return binding?.root
     }
 
     override fun onDestroyView() {

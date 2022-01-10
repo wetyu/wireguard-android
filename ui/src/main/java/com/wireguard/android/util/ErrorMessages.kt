@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.util
@@ -36,7 +36,8 @@ object ErrorMessages {
             BackendException.Reason.VPN_NOT_AUTHORIZED to R.string.vpn_not_authorized_error,
             BackendException.Reason.UNABLE_TO_START_VPN to R.string.vpn_start_error,
             BackendException.Reason.TUN_CREATION_ERROR to R.string.tun_create_error,
-            BackendException.Reason.GO_ACTIVATION_ERROR_CODE to R.string.tunnel_on_error
+            BackendException.Reason.GO_ACTIVATION_ERROR_CODE to R.string.tunnel_on_error,
+            BackendException.Reason.DNS_RESOLUTION_FAILURE to R.string.tunnel_dns_failure
     )
     private val KFE_FORMAT_MAP = mapOf(
             Key.Format.BASE64 to R.string.key_length_explanation_base64,

@@ -4,16 +4,16 @@
         <item quantity="other">无法删除 %d 项：%s</item>
     </plurals>
     <plurals name="delete_success">
-        <item quantity="other">删除了 %d 项</item>
+        <item quantity="other">成功删除了 %d 项</item>
     </plurals>
     <plurals name="delete_title">
-        <item quantity="other">已选择 %d 项</item>
+        <item quantity="other">已选择 %d 个隧道</item>
     </plurals>
     <plurals name="import_partial_success">
         <item quantity="other">导入了 %2$d 项中的 %1$d 项</item>
     </plurals>
     <plurals name="import_total_success">
-        <item quantity="other">导入了 %d 项</item>
+        <item quantity="other">导入了 %d 个隧道</item>
     </plurals>
     <plurals name="set_excluded_applications">
         <item quantity="other">对 %d 个应用不生效</item>
@@ -27,7 +27,7 @@
     <plurals name="n_included_applications">
         <item quantity="other">对 %d 个应用生效</item>
     </plurals>
-    <string name="all_applications">全部应用程序</string>
+    <string name="all_applications">应用过滤</string>
     <string name="exclude_from_tunnel">不生效</string>
     <string name="include_in_tunnel">生效</string>
     <plurals name="include_n_applications">
@@ -50,7 +50,6 @@
     <string name="allow_remote_control_intents_summary_on">外部应用当前能够控制隧道（面向高级用户）</string>
     <string name="allow_remote_control_intents_title">授权外部控制</string>
     <string name="allowed_ips">路由的 IP 地址（段）</string>
-    <string name="app_name">WireGuard</string>
     <string name="bad_config_context">%1$s 的 %2$s 字段</string>
     <string name="bad_config_context_top_level">%s</string>
     <string name="bad_config_error">在 %2$s发生了%1$s的问题</string>
@@ -84,10 +83,17 @@
     <string name="create_output_dir_error">无法创建输出目录</string>
     <string name="create_temp_dir_error">无法创建本地临时目录</string>
     <string name="create_tunnel">创建隧道</string>
+    <string name="copied_to_clipboard">%s 已复制到剪贴板</string>
     <string name="dark_theme_summary_off">正在使用亮色（白昼）主题</string>
     <string name="dark_theme_summary_on">正在使用暗色（黑夜）主题</string>
     <string name="dark_theme_title">使用暗色主题</string>
     <string name="delete">删除</string>
+    <string name="tv_delete">选择要删除的隧道</string>
+    <string name="tv_select_a_storage_drive">选择一个存储驱动器</string>
+    <string name="tv_no_file_picker">请安装一个文件管理工具以浏览文件</string>
+    <string name="tv_add_tunnel_get_started">添加第一个隧道</string>
+    <string name="disable_config_export_title">禁止导出配置</string>
+    <string name="disable_config_export_description">禁止导出配置可降低私钥泄露的风险</string>
     <string name="dns_servers">DNS 服务器</string>
     <string name="edit">编辑</string>
     <string name="endpoint">对端</string>
@@ -123,15 +129,15 @@
     <string name="log_viewer_pref_title">查看应用日志</string>
     <string name="log_viewer_title">日志</string>
     <string name="logcat_error">无法运行 logcat： </string>
-    <string name="module_disabler_disabled_summary">内核空间的模块性能较强，但可能不稳定</string>
-    <string name="module_disabler_disabled_title">启用内核模块</string>
-    <string name="module_disabler_enabled_summary">用户空间的模块性能较弱，但稳定性更好</string>
-    <string name="module_disabler_enabled_title">停用内核模块</string>
+    <string name="module_enabler_disabled_summary">内核空间的模块性能较强，但可能不稳定</string>
+    <string name="module_enabler_disabled_title">启用内核模块</string>
+    <string name="module_enabler_enabled_summary">用户空间的模块性能较弱，但稳定性更好</string>
+    <string name="module_enabler_enabled_title">停用内核模块</string>
     <string name="module_installer_error">发生错误，请重试</string>
     <string name="module_installer_initial">使用内核模块可以提升性能（实验性）</string>
     <string name="module_installer_not_found">没有可用于此设备的模块</string>
     <string name="module_installer_title">下载并安装内核模块</string>
-    <string name="module_installer_working">正在下载安装...</string>
+    <string name="module_installer_working">正在下载安装…</string>
     <string name="module_version_error">无法确定内核模块版本</string>
     <string name="mtu">MTU</string>
     <string name="multiple_tunnels_summary_off">当前一次只能开启一条隧道</string>
@@ -165,7 +171,7 @@
     <string name="shell_exit_status_read_error">Shell 无法读取退出状态</string>
     <string name="shell_marker_count_error">Shell 应获取 4 个标记，获取到 %d 个</string>
     <string name="shell_start_error">Shell 启动失败：%d</string>
-    <string name="success_application_will_restart">成功，应用即将重启...</string>
+    <string name="success_application_will_restart">成功，应用即将重启…</string>
     <string name="toggle_all">反选</string>
     <string name="toggle_error">切换隧道状态时出错：%s</string>
     <string name="tools_installer_already">wg 与 wg-quick 已安装</string>
@@ -176,7 +182,7 @@
     <string name="tools_installer_success_magisk">wg 与 wg-quick 已安装为 Magisk 模块（重启后生效）</string>
     <string name="tools_installer_success_system">wg 与 wg-quick 已安装至系统分区</string>
     <string name="tools_installer_title">安装命令行工具</string>
-    <string name="tools_installer_working">正在安装 wg 与 wg-quick...</string>
+    <string name="tools_installer_working">正在安装 wg 与 wg-quick…</string>
     <string name="tools_unavailable_error">所需工具不可用</string>
     <string name="transfer">流量</string>
     <string name="transfer_bytes">%d B</string>
@@ -194,12 +200,13 @@
     <string name="tunnel_list_placeholder">点击下方按钮添加隧道</string>
     <string name="tunnel_name">隧道名称</string>
     <string name="tunnel_on_error">无法开启隧道（wgTurnOn returned %d）</string>
+    <string name="tunnel_dns_failure">无法解析 DNS 主机名：“%s”</string>
     <string name="tunnel_rename_error">无法重命名隧道：%s</string>
     <string name="tunnel_rename_success">隧道已重命名为 “%s”</string>
     <string name="type_name_go_userspace">Go userspace</string>
     <string name="type_name_kernel_module">Kernel module</string>
     <string name="unknown_error">未知错误</string>
-    <string name="version_summary">%1$s backend v%2$s</string>
+    <string name="version_summary">%1$s 后端 %2$s</string>
     <string name="version_summary_checking">正在检查 %s backend 版本</string>
     <string name="version_summary_unknown">未知的 %s 版本</string>
     <string name="version_title">WireGuard for Android v%s</string>

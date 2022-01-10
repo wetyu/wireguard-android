@@ -1,40 +1,30 @@
 buildscript {
     ext {
-        activityVersion = '1.2.0-rc01'
-        agpVersion = '4.1.1'
-        annotationsVersion = '1.1.0'
-        appcompatVersion = '1.2.0'
-        biometricVersion = '1.1.0-rc01'
-        collectionVersion = '1.1.0'
-        constraintLayoutVersion = '2.0.4'
+        activityVersion = '1.4.0'
+        annotationsVersion = '1.3.0'
+        appcompatVersion = '1.4.0'
+        biometricVersion = '1.1.0'
+        collectionVersion = '1.2.0'
+        constraintLayoutVersion = '2.1.2'
         coordinatorLayoutVersion = '1.1.0'
-        coreKtxVersion = '1.3.2'
-        coroutinesVersion = '1.4.2'
-        datastoreVersion = '1.0.0-alpha02'
-        desugarVersion = '1.0.10'
-        fragmentVersion = '1.3.0-rc02'
+        coreKtxVersion = '1.7.0'
+        coroutinesVersion = '1.6.0'
+        datastoreVersion = '1.0.0'
+        desugarVersion = '1.1.5'
+        fragmentVersion = '1.4.0'
         jsr305Version = '3.0.2'
-        junitVersion = '4.13.1'
-        kotlinVersion = '1.4.21-2'
-        lifecycleRuntimeKtxVersion = '2.3.0-rc01'
-        materialComponentsVersion = '1.3.0-rc01'
+        junitVersion = '4.13.2'
+        lifecycleRuntimeKtxVersion = '2.4.0'
+        materialComponentsVersion = '1.4.0'
         preferenceVersion = '1.1.1'
-        zxingEmbeddedVersion = '3.6.0'
+        zxingEmbeddedVersion = '4.3.0'
 
         groupName = 'com.wireguard.android'
-    }
-    dependencies {
-        classpath "com.android.tools.build:gradle:$agpVersion"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-    }
-    repositories {
-        google()
-        jcenter()
     }
 }
 
 plugins {
-    id "de.undercouch.download" version "4.1.1"
+    id "de.undercouch.download" version "4.1.2"
 }
 
 task downloadCrowdin(type: Download) {
@@ -66,22 +56,14 @@ task crowdin(type: Copy, dependsOn: ['extractCrowdin']) {
     }
 }
 
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
-
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
 tasks {
     wrapper {
-        gradleVersion = "6.8.1"
-        distributionType = Wrapper.DistributionType.ALL
-        distributionSha256Sum = "3db89524a3981819ff28c3f979236c1274a726e146ced0c8a2020417f9bc0782"
+        gradleVersion = "7.3.3"
+        distributionSha256Sum = "b586e04868a22fd817c8971330fec37e298f3242eb85c374181b12d637f80302"
     }
 }
 

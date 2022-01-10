@@ -16,13 +16,13 @@ macOS users may need [flock(1)](https://github.com/discoteq/flock).
 
 ## Embedding
 
-The tunnel library is [on JCenter](https://bintray.com/wireguard/wireguard-android/wireguard-android/_latestVersion), alongside [extensive class library documentation](https://javadoc.io/doc/com.wireguard.android/tunnel).
+The tunnel library is [on Maven Central](https://search.maven.org/artifact/com.wireguard.android/tunnel), alongside [extensive class library documentation](https://javadoc.io/doc/com.wireguard.android/tunnel).
 
 ```
 implementation 'com.wireguard.android:tunnel:$wireguardTunnelVersion'
 ```
 
-The library makes use of Java 8 features, so be sure to support those in your gradle configuration with desugaring:
+The library makes use of Java 8 features, so be sure to support those in your gradle configuration with [desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring):
 
 ```
 compileOptions {
@@ -31,7 +31,7 @@ compileOptions {
     coreLibraryDesugaringEnabled = true
 }
 dependencies {
-    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:1.0.10"
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:1.1.5"
 }
 ```
 

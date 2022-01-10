@@ -63,7 +63,6 @@
     <string name="allow_remote_control_intents_summary_on">बाहरी ऐप्स टनल्स को चालू कर सकते है (एडवांस्ड)</string>
     <string name="allow_remote_control_intents_title">रिमोट कंट्रोल ऐप्स की अनुमति दें</string>
     <string name="allowed_ips">अनुमत आईपी</string>
-    <string name="app_name">WireGuard</string>
     <string name="bad_config_explanation_pka">: सकारात्मक होना चाहिए और 65535 से अधिक नहीं होना चाहिए</string>
     <string name="bad_config_explanation_positive_number">: सकारात्मक होना चाहिए</string>
     <string name="bad_config_explanation_udp_port">: एक वैध यूडीपी पोर्ट नंबर होना चाहिए</string>
@@ -133,10 +132,10 @@
     <string name="log_viewer_pref_title">एप्लिकेशन लॉग देखें</string>
     <string name="log_viewer_title">लॉग</string>
     <string name="logcat_error">लॉगकैट चलाने में असमर्थ: </string>
-    <string name="module_disabler_disabled_summary">प्रयोगात्मक कर्नेल मॉड्यूल प्रदर्शन में सुधार कर सकता है</string>
-    <string name="module_disabler_disabled_title">कर्नेल मॉड्यूल बैकएंड सक्षम करें</string>
-    <string name="module_disabler_enabled_summary">धीमे यूजरस्पेस बैकएंड में स्थिरता में सुधार हो सकता है</string>
-    <string name="module_disabler_enabled_title">कर्नेल मॉड्यूल बैकएंड को अक्षम करें</string>
+    <string name="module_enabler_disabled_summary">प्रयोगात्मक कर्नेल मॉड्यूल प्रदर्शन में सुधार कर सकता है</string>
+    <string name="module_enabler_disabled_title">कर्नेल मॉड्यूल बैकएंड सक्षम करें</string>
+    <string name="module_enabler_enabled_summary">धीमे यूजरस्पेस बैकएंड में स्थिरता में सुधार हो सकता है</string>
+    <string name="module_enabler_enabled_title">कर्नेल मॉड्यूल बैकएंड को अक्षम करें</string>
     <string name="module_installer_error">कुछ गलत हो गया। कृपया पुन: प्रयास करें</string>
     <string name="module_installer_initial">प्रयोगात्मक कर्नेल मॉड्यूल प्रदर्शन में सुधार कर सकता है</string>
     <string name="module_installer_not_found">आपके डिवाइस के लिए कोई मॉड्यूल उपलब्ध नहीं हैं</string>
@@ -175,7 +174,7 @@
     <string name="shell_exit_status_read_error">शेल बाहर निकलने की स्थिति नहीं पढ़ सकता</string>
     <string name="shell_marker_count_error">शेल ने 4 मार्करों की अपेक्षा की, %d प्राप्त किया</string>
     <string name="shell_start_error">शेल शुरू करने में विफल: %d</string>
-    <string name="success_application_will_restart">सफलता। एप्लीकेशन अब पुनः आरंभ होगा...</string>
+    <string name="success_application_will_restart">सफलता। एप्लीकेशन अब पुनः आरंभ होगा…</string>
     <string name="toggle_all">सबको स्विच करे</string>
     <string name="toggle_error">वायरगार्ड टनल टॉगल करने में त्रुटि: %s</string>
     <string name="tools_installer_already">wg और wg-quick पहले से इंस्टॉल हैं</string>
@@ -203,7 +202,6 @@
     <string name="type_name_go_userspace">userspace पे जाए </string>
     <string name="type_name_kernel_module">कर्नेल मॉड्यूल</string>
     <string name="unknown_error">अज्ञात त्रुटि</string>
-    <string name="version_summary">%1$s बैकएंड v%2$s</string>
     <string name="version_summary_checking">%s बैकएंड संस्करण की जाँच कर रहा है</string>
     <string name="version_summary_unknown">अज्ञात %s संस्करण</string>
     <string name="version_title">WireGuard for Android v%s</string>

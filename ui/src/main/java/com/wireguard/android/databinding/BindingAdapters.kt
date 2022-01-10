@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.databinding
@@ -150,6 +150,12 @@ object BindingAdapters {
     @BindingAdapter("android:text")
     fun setInetAddressSetText(view: TextView, addresses: Iterable<InetAddress?>?) {
         view.text = if (addresses != null) Attribute.join(addresses.map { it?.hostAddress }) else ""
+    }
+
+    @JvmStatic
+    @BindingAdapter("android:text")
+    fun setStringSetText(view: TextView, strings: Iterable<String?>?) {
+        view.text = if (strings != null) Attribute.join(strings) else ""
     }
 
     @JvmStatic

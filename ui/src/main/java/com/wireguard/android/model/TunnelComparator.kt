@@ -1,11 +1,9 @@
 /*
- * Copyright © 2020 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 package com.wireguard.android.model
-
-import java.util.Locale
 
 object TunnelComparator : Comparator<String> {
     private class NaturalSortString(originalString: String) {
@@ -29,7 +27,7 @@ object TunnelComparator : Comparator<String> {
         val tokens: MutableList<NaturalSortToken> = ArrayList()
 
         init {
-            for (s in NATURAL_SORT_DIGIT_FINDER.findAll(originalString.split(WHITESPACE_FINDER).joinToString(" ").toLowerCase(Locale.ENGLISH))) {
+            for (s in NATURAL_SORT_DIGIT_FINDER.findAll(originalString.split(WHITESPACE_FINDER).joinToString(" ").lowercase())) {
                 try {
                     val n = s.value.toInt()
                     tokens.add(NaturalSortToken(null, n))

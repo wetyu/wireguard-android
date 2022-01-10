@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.fragment
@@ -21,7 +21,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
-import com.google.zxing.integration.android.IntentIntegrator
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import com.wireguard.android.Application
 import com.wireguard.android.R
 import com.wireguard.android.activity.TunnelCreatorActivity
@@ -55,12 +56,12 @@ class TunnelListFragment : BaseFragment() {
         }
     }
 
-    private val qrImportResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val qrCode = IntentIntegrator.parseActivityResult(result.resultCode, result.data)?.contents
-                ?: return@registerForActivityResult
-        val activity = activity ?: return@registerForActivityResult
-        val fragManager = parentFragmentManager
-        activity.lifecycleScope.launch { TunnelImporter.importTunnel(fragManager, qrCode) { showSnackbar(it) } }
+    private val qrImportResultLauncher = registerForActivityResult(ScanContract()) { result ->
+        val qrCode = result.contents
+        val activity = activity
+        if (qrCode != null && activity != null) {
+            activity.lifecycleScope.launch { TunnelImporter.importTunnel(parentFragmentManager, qrCode) { showSnackbar(it) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -89,11 +90,10 @@ class TunnelListFragment : BaseFragment() {
                             tunnelFileImportResultLauncher.launch("*/*")
                         }
                         AddTunnelsSheet.REQUEST_SCAN -> {
-                            qrImportResultLauncher.launch(IntentIntegrator(requireActivity())
+                            qrImportResultLauncher.launch(ScanOptions()
                                     .setOrientationLocked(false)
                                     .setBeepEnabled(false)
-                                    .setPrompt(getString(R.string.qr_code_hint))
-                                    .createScanIntent())
+                                    .setPrompt(getString(R.string.qr_code_hint)))
                         }
                     }
                 }
@@ -101,7 +101,7 @@ class TunnelListFragment : BaseFragment() {
             }
             executePendingBindings()
         }
-        return binding!!.root
+        return binding?.root
     }
 
     override fun onDestroyView() {
@@ -239,7 +239,7 @@ class TunnelListFragment : BaseFragment() {
             resources = null
             animateFab(binding?.createFab, true)
             checkedItems.clear()
-            binding!!.tunnelList.adapter!!.notifyDataSetChanged()
+            binding?.tunnelList?.adapter?.notifyDataSetChanged()
         }
 
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
