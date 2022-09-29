@@ -268,6 +268,13 @@
                         app:layout_constraintTop_toBottomOf="@+id/mtu_label"
                         tools:text="1500" />
 
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/listen_port_mtu_barrier"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="listen_port_text,mtu_text" />
+
                     <TextView
                         android:id="@+id/applications_label"
                         android:layout_width="match_parent"
@@ -276,8 +283,8 @@
                         android:labelFor="@+id/applications_text"
                         android:text="@string/applications"
                         android:visibility="@{config.interface.includedApplications.isEmpty() &amp;&amp; config.interface.excludedApplications.isEmpty() ? android.view.View.GONE : android.view.View.VISIBLE}"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/listen_port_text" />
+                        app:layout_constraintTop_toBottomOf="@+id/listen_port_mtu_barrier"
+                        app:layout_constraintStart_toStartOf="parent" />
 
                     <TextView
                         android:id="@+id/applications_text"
@@ -291,8 +298,8 @@
                         android:onClick="@{ClipboardUtils::copyTextView}"
                         android:text="@{config.interface.includedApplications.isEmpty() ? @plurals/n_excluded_applications(config.interface.excludedApplications.size(), config.interface.excludedApplications.size()) : @plurals/n_included_applications(config.interface.includedApplications.size(), config.interface.includedApplications.size())}"
                         android:visibility="@{config.interface.includedApplications.isEmpty() &amp;&amp; config.interface.excludedApplications.isEmpty() ? android.view.View.GONE : android.view.View.VISIBLE}"
-                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/applications_label"
+                        app:layout_constraintStart_toStartOf="parent"
                         tools:text="8 excluded" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>

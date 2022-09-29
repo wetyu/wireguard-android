@@ -16,6 +16,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.google.android.material.color.DynamicColors
 import com.wireguard.android.backend.Backend
 import com.wireguard.android.backend.GoBackend
 import com.wireguard.android.backend.WgQuickBackend
@@ -64,11 +65,9 @@ class Application : android.app.Application() {
 
     private suspend fun determineBackend(): Backend {
         var backend: Backend? = null
-        var didStartRootShell = false
         if (UserKnobs.enableKernelModule.first() && WgQuickBackend.hasKernelSupport()) {
             try {
-                if (!didStartRootShell)
-                    rootShell.start()
+                rootShell.start()
                 val wgQuickBackend = WgQuickBackend(applicationContext, rootShell, toolsInstaller)
                 wgQuickBackend.setMultipleTunnels(UserKnobs.multipleTunnels.first())
                 backend = wgQuickBackend
@@ -88,6 +87,7 @@ class Application : android.app.Application() {
     override fun onCreate() {
         Log.i(TAG, USER_AGENT)
         super.onCreate()
+        DynamicColors.applyToActivitiesIfAvailable(this)
         rootShell = RootShell(applicationContext)
         toolsInstaller = ToolsInstaller(applicationContext, rootShell)
         preferencesDataStore = PreferenceDataStoreFactory.create { applicationContext.preferencesDataStoreFile("settings") }
