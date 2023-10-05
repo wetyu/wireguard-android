@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.fragment
@@ -32,10 +32,6 @@ class AddTunnelsSheet : BottomSheetDialogFragment() {
                 dismiss()
             }
         }
-    }
-
-    override fun getTheme(): Int {
-        return R.style.BottomSheetDialogTheme
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -76,7 +72,7 @@ class AddTunnelsSheet : BottomSheetDialogFragment() {
             }
         })
         val gradientDrawable = GradientDrawable().apply {
-            setColor(requireContext().resolveAttribute(R.attr.colorBackground))
+            setColor(requireContext().resolveAttribute(com.google.android.material.R.attr.colorSurface))
         }
         view.background = gradientDrawable
     }

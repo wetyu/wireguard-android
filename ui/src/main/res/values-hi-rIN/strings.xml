@@ -76,6 +76,7 @@
     <string name="bad_config_reason_unknown_section">अज्ञात एट्रिब्यूट </string>
     <string name="bad_config_reason_value_out_of_range">मूल्य सीमा से बाहर</string>
     <string name="bad_extension_error">फ़ाइल .conf या .zip होनी चाहिए</string>
+    <string name="error_no_qr_found">छवि में क्यूआर कोड नहीं मिला</string>
     <string name="cancel">रद्द</string>
     <string name="config_delete_error">कॉन्फ़िगरेशन फ़ाइल %s को नहीं हटा सकता</string>
     <string name="config_exists_error">“%s” के लिए कॉन्फ़िगरेशन पहले से मौजूद है</string>
@@ -194,7 +195,6 @@
     <string name="tunnel_create_success">सफलतापूर्वक बनाया गया टनल “%s”</string>
     <string name="tunnel_error_already_exists">टनल “%s” पहले से मौजूद है</string>
     <string name="tunnel_error_invalid_name">गलत नाम</string>
-    <string name="tunnel_list_placeholder">नीले बटन का उपयोग करके एक टनल को जोड़ें</string>
     <string name="tunnel_name">टनल का नाम</string>
     <string name="tunnel_on_error">टनल चालू करने में असमर्थ (wgTurnOn लौटा %d)</string>
     <string name="tunnel_rename_error">टनल का नाम बदलने में असमर्थ: %s</string>
@@ -202,6 +202,7 @@
     <string name="type_name_go_userspace">userspace पे जाए </string>
     <string name="type_name_kernel_module">कर्नेल मॉड्यूल</string>
     <string name="unknown_error">अज्ञात त्रुटि</string>
+    <string name="version_summary">%1$s बैकएंड %2$s</string>
     <string name="version_summary_checking">%s बैकएंड संस्करण की जाँच कर रहा है</string>
     <string name="version_summary_unknown">अज्ञात %s संस्करण</string>
     <string name="version_title">WireGuard for Android v%s</string>

@@ -1,9 +1,10 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android
 
+import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -49,32 +50,36 @@ class QuickTileService : TileService() {
     }
 
     override fun onClick() {
-        if (tunnel != null) {
-            unlockAndRun {
-                val tile = qsTile
-                if (tile != null) {
-                    tile.icon = if (tile.icon == iconOn) iconOff else iconOn
-                    tile.updateTile()
+        when (val tunnel = tunnel) {
+            null -> {
+                val intent = Intent(this, MainActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    startActivityAndCollapse(PendingIntent.getActivity(this, 0, intent,  PendingIntent.FLAG_IMMUTABLE))
+                } else {
+                    @Suppress("DEPRECATION")
+                    startActivityAndCollapse(intent)
                 }
-                applicationScope.launch {
-                    try {
-                        tunnel!!.setStateAsync(Tunnel.State.TOGGLE)
-                        updateTile()
-                    } catch (_: Throwable) {
-                        val toggleIntent = Intent(this@QuickTileService, TunnelToggleActivity::class.java)
-                        toggleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(toggleIntent)
+            }
+            else -> {
+                unlockAndRun {
+                    applicationScope.launch {
+                        try {
+                            tunnel.setStateAsync(Tunnel.State.TOGGLE)
+                            updateTile()
+                        } catch (_: Throwable) {
+                            val toggleIntent = Intent(this@QuickTileService, TunnelToggleActivity::class.java)
+                            toggleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            startActivity(toggleIntent)
+                        }
                     }
                 }
             }
-        } else {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivityAndCollapse(intent)
         }
     }
 
     override fun onCreate() {
+        isAdded = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             iconOn = Icon.createWithResource(this, R.drawable.ic_tile)
             iconOff = iconOn
@@ -84,55 +89,64 @@ class QuickTileService : TileService() {
         icon.setAnimationEnabled(false) /* Unfortunately we can't have animations, since Icons are marshaled. */
         icon.setSlashed(false)
         var b = Bitmap.createBitmap(icon.intrinsicWidth, icon.intrinsicHeight, Bitmap.Config.ARGB_8888)
-                ?: return
         var c = Canvas(b)
         icon.setBounds(0, 0, c.width, c.height)
         icon.draw(c)
         iconOn = Icon.createWithBitmap(b)
         icon.setSlashed(true)
         b = Bitmap.createBitmap(icon.intrinsicWidth, icon.intrinsicHeight, Bitmap.Config.ARGB_8888)
-                ?: return
         c = Canvas(b)
         icon.setBounds(0, 0, c.width, c.height)
         icon.draw(c)
         iconOff = Icon.createWithBitmap(b)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        isAdded = false
+    }
+
     override fun onStartListening() {
         Application.getTunnelManager().addOnPropertyChangedCallback(onTunnelChangedCallback)
-        if (tunnel != null) tunnel!!.addOnPropertyChangedCallback(onStateChangedCallback)
+        tunnel?.addOnPropertyChangedCallback(onStateChangedCallback)
         updateTile()
     }
 
     override fun onStopListening() {
-        if (tunnel != null) tunnel!!.removeOnPropertyChangedCallback(onStateChangedCallback)
+        tunnel?.removeOnPropertyChangedCallback(onStateChangedCallback)
         Application.getTunnelManager().removeOnPropertyChangedCallback(onTunnelChangedCallback)
+    }
+
+    override fun onTileAdded() {
+        isAdded = true
+    }
+
+    override fun onTileRemoved() {
+        isAdded = false
     }
 
     private fun updateTile() {
         // Update the tunnel.
         val newTunnel = Application.getTunnelManager().lastUsedTunnel
         if (newTunnel != tunnel) {
-            if (tunnel != null) tunnel!!.removeOnPropertyChangedCallback(onStateChangedCallback)
+            tunnel?.removeOnPropertyChangedCallback(onStateChangedCallback)
             tunnel = newTunnel
-            if (tunnel != null) tunnel!!.addOnPropertyChangedCallback(onStateChangedCallback)
+            tunnel?.addOnPropertyChangedCallback(onStateChangedCallback)
         }
         // Update the tile contents.
-        val label: String
-        val state: Int
-        val tile = qsTile
-        if (tunnel != null) {
-            label = tunnel!!.name
-            state = if (tunnel!!.state == Tunnel.State.UP) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
-        } else {
-            label = getString(R.string.app_name)
-            state = Tile.STATE_INACTIVE
-        }
-        if (tile == null) return
-        tile.label = label
-        if (tile.state != state) {
-            tile.icon = if (state == Tile.STATE_ACTIVE) iconOn else iconOff
-            tile.state = state
+        val tile = qsTile ?: return
+
+        when (val tunnel = tunnel) {
+            null -> {
+                tile.label = getString(R.string.app_name)
+                tile.state = Tile.STATE_INACTIVE
+                tile.icon = iconOff
+            }
+            else -> {
+                tile.label = tunnel.name
+                tile.state = if (tunnel.state == Tunnel.State.UP) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+                tile.icon = if (tunnel.state == Tunnel.State.UP) iconOn else iconOff
+            }
         }
         tile.updateTile()
     }
@@ -143,19 +157,23 @@ class QuickTileService : TileService() {
                 sender.removeOnPropertyChangedCallback(this)
                 return
             }
-            if (propertyId != 0 && propertyId != BR.state) return
+            if (propertyId != 0 && propertyId != BR.state)
+                return
             updateTile()
         }
     }
 
     private inner class OnTunnelChangedCallback : OnPropertyChangedCallback() {
         override fun onPropertyChanged(sender: Observable, propertyId: Int) {
-            if (propertyId != 0 && propertyId != BR.lastUsedTunnel) return
+            if (propertyId != 0 && propertyId != BR.lastUsedTunnel)
+                return
             updateTile()
         }
     }
 
     companion object {
         private const val TAG = "WireGuard/QuickTileService"
+        var isAdded: Boolean = false
+            private set
     }
 }

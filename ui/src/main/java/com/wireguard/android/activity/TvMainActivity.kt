@@ -1,11 +1,14 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 
 package com.wireguard.android.activity
 
 import android.Manifest
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -16,17 +19,21 @@ import android.os.storage.StorageVolume
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.view.forEach
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.Observable
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.wireguard.android.Application
 import com.wireguard.android.R
 import com.wireguard.android.backend.GoBackend
@@ -41,6 +48,8 @@ import com.wireguard.android.model.ObservableTunnel
 import com.wireguard.android.util.ErrorMessages
 import com.wireguard.android.util.QuantityFormatter
 import com.wireguard.android.util.TunnelImporter
+import com.wireguard.android.util.UserKnobs
+import com.wireguard.android.util.applicationScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,7 +57,27 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class TvMainActivity : AppCompatActivity() {
-    private val tunnelFileImportResultLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { data ->
+    private val tunnelFileImportResultLauncher = registerForActivityResult(object : ActivityResultContracts.GetContent() {
+        override fun createIntent(context: Context, input: String): Intent {
+            val intent = super.createIntent(context, input)
+
+            /* AndroidTV now comes with stubs that do nothing but display a Toast less helpful than
+             * what we can do, so detect this and throw an exception that we can catch later. */
+            val activitiesToResolveIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()))
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+            }
+            if (activitiesToResolveIntent.all {
+                    val name = it.activityInfo.packageName
+                    name.startsWith("com.google.android.tv.frameworkpackagestubs") || name.startsWith("com.android.tv.frameworkpackagestubs")
+                }) {
+                throw ActivityNotFoundException()
+            }
+            return intent
+        }
+    }) { data ->
         if (data == null) return@registerForActivityResult
         lifecycleScope.launch {
             TunnelImporter.importTunnel(contentResolver, data) {
@@ -84,6 +113,14 @@ class TvMainActivity : AppCompatActivity() {
     private val filesRoot = ObservableField("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_YES) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                applicationScope.launch {
+                    UserKnobs.setDarkTheme(true)
+                }
+            }
+        }
         super.onCreate(savedInstanceState)
         binding = TvActivityBinding.inflate(layoutInflater)
         lifecycleScope.launch {
@@ -174,7 +211,13 @@ class TvMainActivity : AppCompatActivity() {
                 try {
                     tunnelFileImportResultLauncher.launch("*/*")
                 } catch (_: Throwable) {
-                    Toast.makeText(this@TvMainActivity, getString(R.string.tv_no_file_picker), Toast.LENGTH_LONG).show()
+                    MaterialAlertDialogBuilder(binding.root.context).setMessage(R.string.tv_no_file_picker).setCancelable(false)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            try {
+                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://webstoreredirect")))
+                            } catch (_: Throwable) {
+                            }
+                        }.show()
                 }
             }
         }
@@ -185,6 +228,17 @@ class TvMainActivity : AppCompatActivity() {
                 binding.tunnelList.requestFocus()
             }
         }
+
+        val backPressedCallback = onBackPressedDispatcher.addCallback(this) { handleBackPressed() }
+        val updateBackPressedCallback = object : Observable.OnPropertyChangedCallback() {
+            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+                backPressedCallback.isEnabled = isDeleting.get() || filesRoot.get()?.isNotEmpty() == true
+            }
+        }
+        isDeleting.addOnPropertyChangedCallback(updateBackPressedCallback)
+        filesRoot.addOnPropertyChangedCallback(updateBackPressedCallback)
+        backPressedCallback.isEnabled = false
+
         binding.executePendingBindings()
         setContentView(binding.root)
 
@@ -298,7 +352,7 @@ class TvMainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onBackPressed() {
+    private fun handleBackPressed() {
         when {
             isDeleting.get() -> {
                 isDeleting.set(false)
@@ -306,6 +360,7 @@ class TvMainActivity : AppCompatActivity() {
                     binding.tunnelList.requestFocus()
                 }
             }
+
             filesRoot.get()?.isNotEmpty() == true -> {
                 files.clear()
                 filesRoot.set("")
@@ -313,14 +368,13 @@ class TvMainActivity : AppCompatActivity() {
                     binding.tunnelList.requestFocus()
                 }
             }
-            else -> super.onBackPressed()
         }
     }
 
     private suspend fun updateStats() {
         binding.tunnelList.forEach { viewItem ->
             val listItem = DataBindingUtil.findBinding<TvTunnelListItemBinding>(viewItem)
-                    ?: return@forEach
+                ?: return@forEach
             try {
                 val tunnel = listItem.item!!
                 if (tunnel.state != Tunnel.State.UP || isDeleting.get()) {

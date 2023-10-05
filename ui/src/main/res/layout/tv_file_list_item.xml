@@ -21,7 +21,6 @@
         android:layout_margin="8dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="0dp"
-        android:backgroundTint="@color/tv_card_background"
         android:checkable="true"
         android:focusable="true"
         app:contentPadding="8dp">
@@ -31,11 +30,10 @@
             android:layout_height="match_parent">
 
             <com.google.android.material.textview.MaterialTextView
-                style="@style/TextAppearance.MaterialComponents.Headline5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{key}"
-                android:textColor="?attr/colorOnPrimary"
+                android:textAppearance="?attr/textAppearanceTitleLarge"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

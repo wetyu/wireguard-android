@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.widget
@@ -11,10 +11,10 @@ import android.widget.RelativeLayout
 import com.wireguard.android.R
 
 class MultiselectableRelativeLayout @JvmOverloads constructor(
-        context: Context? = null,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0,
-        defStyleRes: Int = 0
+    context: Context? = null,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+    defStyleRes: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr, defStyleRes) {
     private var multiselected = false
 

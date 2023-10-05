@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.configStore
@@ -40,9 +40,9 @@ class FileConfigStore(private val context: Context) : ConfigStore {
 
     override fun enumerate(): Set<String> {
         return context.fileList()
-                .filter { it.endsWith(".conf") }
-                .map { it.substring(0, it.length - ".conf".length) }
-                .toSet()
+            .filter { it.endsWith(".conf") }
+            .map { it.substring(0, it.length - ".conf".length) }
+            .toSet()
     }
 
     private fun fileFor(name: String): File {

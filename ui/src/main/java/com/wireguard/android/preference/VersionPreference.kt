@@ -1,14 +1,14 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.preference
 
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.AttributeSet
+import android.widget.Toast
 import androidx.preference.Preference
 import com.wireguard.android.Application
 import com.wireguard.android.BuildConfig
@@ -16,6 +16,7 @@ import com.wireguard.android.R
 import com.wireguard.android.backend.Backend
 import com.wireguard.android.backend.GoBackend
 import com.wireguard.android.backend.WgQuickBackend
+import com.wireguard.android.util.ErrorMessages
 import com.wireguard.android.util.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,7 +34,8 @@ class VersionPreference(context: Context, attrs: AttributeSet?) : Preference(con
         intent.data = Uri.parse("https://www.wireguard.com/")
         try {
             context.startActivity(intent)
-        } catch (_: ActivityNotFoundException) {
+        } catch (e: Throwable) {
+            Toast.makeText(context, ErrorMessages[e], Toast.LENGTH_SHORT).show()
         }
     }
 

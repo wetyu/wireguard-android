@@ -31,10 +31,10 @@
     <string name="exclude_from_tunnel">不生效</string>
     <string name="include_in_tunnel">生效</string>
     <plurals name="include_n_applications">
-        <item quantity="other">设定 %d 个应用</item>
+        <item quantity="other">选定 %d 个应用</item>
     </plurals>
     <plurals name="exclude_n_applications">
-        <item quantity="other">设定 %d 个应用</item>
+        <item quantity="other">选定 %d 个应用</item>
     </plurals>
     <plurals name="persistent_keepalive_seconds_unit">
         <item quantity="other">每隔 %d 秒</item>
@@ -46,14 +46,14 @@
     <string name="add_peer">添加节点</string>
     <string name="addresses">局域网 IP 地址</string>
     <string name="applications">应用过滤</string>
-    <string name="allow_remote_control_intents_summary_off">外部应用当前不能控制隧道（不建议勾选）</string>
-    <string name="allow_remote_control_intents_summary_on">外部应用当前能够控制隧道（面向高级用户）</string>
+    <string name="allow_remote_control_intents_summary_off">不允许外部应用控制隧道（推荐）</string>
+    <string name="allow_remote_control_intents_summary_on">允许外部应用控制隧道（面向高级用户）</string>
     <string name="allow_remote_control_intents_title">授权外部控制</string>
     <string name="allowed_ips">路由的 IP 地址（段）</string>
     <string name="bad_config_context">%1$s 的 %2$s 字段</string>
     <string name="bad_config_context_top_level">%s</string>
     <string name="bad_config_error">在 %2$s发生了%1$s的问题</string>
-    <string name="bad_config_explanation_pka">：必须为正整数且不超过 65535</string>
+    <string name="bad_config_explanation_pka">：必须为不超过 65535 的正整数</string>
     <string name="bad_config_explanation_positive_number">：必须为正整数</string>
     <string name="bad_config_explanation_udp_port">：必须为有效的 UDP 端口号</string>
     <string name="bad_config_reason_invalid_key">密钥无效</string>
@@ -66,6 +66,8 @@
     <string name="bad_config_reason_unknown_section">节未知</string>
     <string name="bad_config_reason_value_out_of_range">数值超出范围</string>
     <string name="bad_extension_error">扩展名必须为 .conf 或 .zip</string>
+    <string name="error_no_qr_found">图片中未发现二维码</string>
+    <string name="error_qr_checksum">二维码校验失败</string>
     <string name="cancel">取消</string>
     <string name="config_delete_error">无法删除配置 “%s”</string>
     <string name="config_exists_error">“%s” 的配置已存在</string>
@@ -91,15 +93,20 @@
     <string name="tv_delete">选择要删除的隧道</string>
     <string name="tv_select_a_storage_drive">选择一个存储驱动器</string>
     <string name="tv_no_file_picker">请安装一个文件管理工具以浏览文件</string>
-    <string name="tv_add_tunnel_get_started">添加第一个隧道</string>
+    <string name="tv_add_tunnel_get_started">添加第一条网络隧道</string>
+    <string name="donate_title">♥ 为 WireGuard 捐赠</string>
+    <string name="donate_summary">无论多寡，聚沙成塔</string>
+    <string name="donate_google_play_disappointment">感谢您对 WireGuard 项目的支持！\n\n只可惜，受谷歌的政策所限，我们不能在此展示项目捐赠页面的链接，还望您自行访问捐赠页面！\n\n再次感谢您的贡献。</string>
     <string name="disable_config_export_title">禁止导出配置</string>
     <string name="disable_config_export_description">禁止导出配置可降低私钥泄露的风险</string>
     <string name="dns_servers">DNS 服务器</string>
+    <string name="dns_search_domains">搜索域名</string>
     <string name="edit">编辑</string>
     <string name="endpoint">对端</string>
     <string name="error_down">断开连接时出错：%s</string>
     <string name="error_fetching_apps">获取应用列表时出错：%s</string>
     <string name="error_root">请获取 root 权限并重试</string>
+    <string name="error_prepare">准备连接时出错：%s</string>
     <string name="error_up">建立连接时出错：%s</string>
     <string name="exclude_private_ips">排除局域网</string>
     <string name="generate_new_private_key">生成新的私钥</string>
@@ -113,12 +120,14 @@
     <string name="import_error">无法导入隧道：%s</string>
     <string name="import_from_qr_code">从二维码导入隧道</string>
     <string name="import_success">导入了 “%s”</string>
-    <string name="interface_title">接口 / Interface</string>
+    <string name="interface_title">本地（Interface）</string>
     <string name="key_contents_error">密钥中含有错误字符</string>
     <string name="key_length_error">密钥长度错误</string>
     <string name="key_length_explanation_base64">：WireGuard 的 Base64 密钥长度必须为 44 个字符（32 字节）</string>
     <string name="key_length_explanation_binary">：WireGuard 密钥大小必须为 32 字节</string>
     <string name="key_length_explanation_hex">：WireGuard 的十六进制密钥长度必须为 64 个字符（32 字节）</string>
+    <string name="latest_handshake">上次握手时间</string>
+    <string name="latest_handshake_ago">%s之前</string>
     <string name="listen_port">监听端口</string>
     <string name="log_export_error">无法导出日志：%s</string>
     <string name="log_export_subject">WireGuard 日志文件</string>
@@ -129,7 +138,7 @@
     <string name="log_viewer_pref_title">查看应用日志</string>
     <string name="log_viewer_title">日志</string>
     <string name="logcat_error">无法运行 logcat： </string>
-    <string name="module_enabler_disabled_summary">内核空间的模块性能较强，但可能不稳定</string>
+    <string name="module_enabler_disabled_summary">内核模块（实验性）能够增强性能，启用时需谨慎</string>
     <string name="module_enabler_disabled_title">启用内核模块</string>
     <string name="module_enabler_enabled_summary">用户空间的模块性能较弱，但稳定性更好</string>
     <string name="module_enabler_enabled_title">停用内核模块</string>
@@ -153,7 +162,7 @@
     <string name="parse_error_inet_network">\u0020IP 网络</string>
     <string name="parse_error_integer">数字</string>
     <string name="parse_error_reason">无法解析%1$s “%2$s”\u0020</string>
-    <string name="peer">节点 / Peer</string>
+    <string name="peer">远程（Peer）</string>
     <string name="permission_description">自由控制 WireGuard 隧道的开启或关闭，但可能会导致流量误传</string>
     <string name="permission_label">控制 WireGuard 隧道</string>
     <string name="persistent_keepalive">连接保活间隔</string>
@@ -162,6 +171,10 @@
     <string name="private_key">私钥</string>
     <string name="public_key">公钥</string>
     <string name="qr_code_hint">提示：使用命令 `qrencode -t ansiutf8 &lt; tunnel.conf` 生成二维码</string>
+    <string name="quick_settings_tile_add_title">添加磁贴到快速设置面板</string>
+    <string name="quick_settings_tile_add_summary">通过快捷磁贴开启/关闭上次使用的隧道</string>
+    <string name="quick_settings_tile_add_failure">无法添加快捷磁贴：错误 %d</string>
+    <string name="quick_settings_tile_action">开启/关闭隧道</string>
     <string name="restore_on_boot_summary_off">未启用</string>
     <string name="restore_on_boot_summary_on">设备启动时自动开启上次使用的隧道</string>
     <string name="restore_on_boot_title">启动时恢复</string>
@@ -172,7 +185,7 @@
     <string name="shell_marker_count_error">Shell 应获取 4 个标记，获取到 %d 个</string>
     <string name="shell_start_error">Shell 启动失败：%d</string>
     <string name="success_application_will_restart">成功，应用即将重启…</string>
-    <string name="toggle_all">反选</string>
+    <string name="toggle_all">全选</string>
     <string name="toggle_error">切换隧道状态时出错：%s</string>
     <string name="tools_installer_already">wg 与 wg-quick 已安装</string>
     <string name="tools_installer_failure">无法安装命令行工具（尚未获取 root 权限？）</string>
@@ -206,7 +219,17 @@
     <string name="type_name_go_userspace">Go userspace</string>
     <string name="type_name_kernel_module">Kernel module</string>
     <string name="unknown_error">未知错误</string>
-    <string name="version_summary">%1$s 后端 %2$s</string>
+    <string name="updater_avalable">WireGuard 可以更新了，请立即更新。</string>
+    <string name="updater_action">下载 &amp; 更新</string>
+    <string name="updater_rechecking">正在获取更新元数据…</string>
+    <string name="updater_download_progress">正在下载更新：%1$s / %2$s (%3$.2f%%)</string>
+    <string name="updater_download_progress_nototal">正在下载更新：%s</string>
+    <string name="updater_installing">正在安装更新…</string>
+    <string name="updater_failure">更新失败：%s。将在稍后重试…</string>
+    <string name="updater_corrupt_title">应用损坏</string>
+    <string name="updater_corrupt_message">此应用已损坏。请从下方链接的网站中重新下载 APK，然后卸载此应用并重新安装。</string>
+    <string name="updater_corrupt_navigate">打开网站</string>
+    <string name="version_summary">%1$s backend %2$s</string>
     <string name="version_summary_checking">正在检查 %s backend 版本</string>
     <string name="version_summary_unknown">未知的 %s 版本</string>
     <string name="version_title">WireGuard for Android v%s</string>
@@ -216,8 +239,8 @@
     <string name="zip_export_success">已保存至 “%s”</string>
     <string name="zip_export_summary">zip 压缩包将保存至下载文件夹</string>
     <string name="zip_export_title">导出隧道配置</string>
-    <string name="biometric_prompt_zip_exporter_title">导出配置需要认证指纹</string>
-    <string name="biometric_prompt_private_key_title">查看私钥需要认证指纹</string>
+    <string name="biometric_prompt_zip_exporter_title">导出配置前需要通过认证</string>
+    <string name="biometric_prompt_private_key_title">查看私钥前需要通过认证</string>
     <string name="biometric_auth_error">认证失败</string>
     <string name="biometric_auth_error_reason">认证失败：%s</string>
 </resources>

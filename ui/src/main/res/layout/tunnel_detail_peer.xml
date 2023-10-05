@@ -23,16 +23,16 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/peer_title"
-                style="@style/SectionText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/peer"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/public_key_label"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:labelFor="@+id/public_key_text"
@@ -42,8 +42,7 @@
 
             <TextView
                 android:id="@+id/public_key_text"
-                style="@style/DetailText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/public_key"
                 android:ellipsize="end"
@@ -53,13 +52,14 @@
                 android:onClick="@{ClipboardUtils::copyTextView}"
                 android:singleLine="true"
                 android:text="@{item.publicKey.toBase64}"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/public_key_label"
                 tools:text="wOs2eguFEohqIZxlSJ1CAT9584tc6ejj9hfGFsoBVkA=" />
 
             <TextView
                 android:id="@+id/pre_shared_key_label"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:labelFor="@+id/pre_shared_key_text"
@@ -70,8 +70,7 @@
 
             <TextView
                 android:id="@+id/pre_shared_key_text"
-                style="@style/DetailText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/pre_shared_key"
                 android:ellipsize="end"
@@ -81,6 +80,7 @@
                 android:nextFocusForward="@id/allowed_ips_text"
                 android:singleLine="true"
                 android:text="@string/pre_shared_key_enabled"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
                 android:visibility="@{!item.preSharedKey.isPresent() ? android.view.View.GONE : android.view.View.VISIBLE}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/pre_shared_key_label"
@@ -88,7 +88,7 @@
 
             <TextView
                 android:id="@+id/allowed_ips_label"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:labelFor="@+id/allowed_ips_text"
@@ -99,8 +99,7 @@
 
             <TextView
                 android:id="@+id/allowed_ips_text"
-                style="@style/DetailText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/allowed_ips"
                 android:nextFocusUp="@id/pre_shared_key_text"
@@ -108,6 +107,7 @@
                 android:nextFocusForward="@id/endpoint_text"
                 android:onClick="@{ClipboardUtils::copyTextView}"
                 android:text="@{item.allowedIps}"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
                 android:visibility="@{item.allowedIps.isEmpty() ? android.view.View.GONE : android.view.View.VISIBLE}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/allowed_ips_label"
@@ -115,7 +115,7 @@
 
             <TextView
                 android:id="@+id/endpoint_label"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:labelFor="@+id/endpoint_text"
@@ -126,8 +126,7 @@
 
             <TextView
                 android:id="@+id/endpoint_text"
-                style="@style/DetailText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/endpoint"
                 android:nextFocusUp="@id/allowed_ips_text"
@@ -135,6 +134,7 @@
                 android:nextFocusForward="@id/persistent_keepalive_text"
                 android:onClick="@{ClipboardUtils::copyTextView}"
                 android:text="@{item.endpoint}"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
                 android:visibility="@{!item.endpoint.isPresent() ? android.view.View.GONE : android.view.View.VISIBLE}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/endpoint_label"
@@ -142,7 +142,7 @@
 
             <TextView
                 android:id="@+id/persistent_keepalive_label"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:labelFor="@+id/persistent_keepalive_text"
@@ -153,8 +153,7 @@
 
             <TextView
                 android:id="@+id/persistent_keepalive_text"
-                style="@style/DetailText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/persistent_keepalive"
                 android:nextFocusUp="@id/endpoint_text"
@@ -162,6 +161,7 @@
                 android:nextFocusForward="@id/transfer_text"
                 android:onClick="@{ClipboardUtils::copyTextView}"
                 android:text="@{@plurals/persistent_keepalive_seconds_unit(item.persistentKeepalive.orElse(0), item.persistentKeepalive.orElse(0))}"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
                 android:visibility="@{!item.persistentKeepalive.isPresent() ? android.view.View.GONE : android.view.View.VISIBLE}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/persistent_keepalive_label"
@@ -169,9 +169,9 @@
 
             <TextView
                 android:id="@+id/transfer_label"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/endpoint_text"
+                android:layout_below="@+id/persistent_keepalive_text"
                 android:layout_marginTop="8dp"
                 android:labelFor="@+id/transfer_text"
                 android:text="@string/transfer"
@@ -182,17 +182,45 @@
 
             <TextView
                 android:id="@+id/transfer_text"
-                style="@style/DetailText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/transfer_label"
                 android:contentDescription="@string/transfer"
                 android:nextFocusUp="@id/persistent_keepalive_text"
                 android:onClick="@{ClipboardUtils::copyTextView}"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/transfer_label"
                 tools:text="1024 MB"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/latest_handshake_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/transfer_text"
+                android:layout_marginTop="8dp"
+                android:labelFor="@+id/latest_handshake_text"
+                android:text="@string/latest_handshake"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/transfer_text"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/latest_handshake_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/latest_handshake_label"
+                android:contentDescription="@string/latest_handshake"
+                android:nextFocusUp="@id/transfer_text"
+                android:onClick="@{ClipboardUtils::copyTextView}"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/latest_handshake_label"
+                tools:text="4 minutes, 27 seconds ago"
                 tools:visibility="visible" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

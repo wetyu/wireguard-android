@@ -6,7 +6,7 @@
     </plurals>
     <plurals name="delete_success">
         <item quantity="one">%d تونل با موقیت حذف شد</item>
-        <item quantity="other">%d تونل‌ها با موقیت حذف شدند</item>
+        <item quantity="other">%d تونل‌ با موفقیت حذف شد</item>
     </plurals>
     <plurals name="delete_title">
         <item quantity="one">%d تونل انتخاب شد</item>
@@ -80,6 +80,8 @@
     <string name="bad_config_reason_unknown_section">بخش نامعلوم</string>
     <string name="bad_config_reason_value_out_of_range">مقدار خارج از محدوده</string>
     <string name="bad_extension_error">پرونده باید .conf یا .zip باشد</string>
+    <string name="error_no_qr_found">کد QR در تصویر یافت نشد</string>
+    <string name="error_qr_checksum">بررسی checksum کد QR ناموفق بود</string>
     <string name="cancel">لغو</string>
     <string name="config_delete_error">نمی‌توان پرونده پیکربندی %s را حذف کرد</string>
     <string name="config_exists_error">پیکربندی برای ”%s” در حال حاضر وجود دارد</string>
@@ -97,6 +99,7 @@
     <string name="create_output_dir_error">نمی‌توان دایرکتوری خروجی را ایجاد کرد</string>
     <string name="create_temp_dir_error">نمی‌توان دایرکتوری موقت محلی را ساخت</string>
     <string name="create_tunnel">ساختن تونل</string>
+    <string name="copied_to_clipboard">متن در کلیپ‌بورد کپی شد</string>
     <string name="dark_theme_summary_off">اکنون از پوسته روشن(روز) استفاده می‌شود</string>
     <string name="dark_theme_summary_on">اکنون از پوسته تاریک(شب) استفاده می‌شود</string>
     <string name="dark_theme_title">استفاده از پوسته تاریک</string>
@@ -108,6 +111,7 @@
     <string name="disable_config_export_title">غیرفعال سازی خروجی گرفتن از کانفیگ ها</string>
     <string name="disable_config_export_description">غیرفعال سازی خروجی گرفتن، دسترسی کلیدهای خصوصی را کم می کند</string>
     <string name="dns_servers">سرورهای DNS</string>
+    <string name="dns_search_domains">جست‌وجوی دامنه‌ها</string>
     <string name="edit">ویرایش</string>
     <string name="endpoint">نقطه پایان</string>
     <string name="error_down">خطا هنگام بستن تونل: %s</string>
@@ -211,14 +215,15 @@
     <string name="tunnel_create_success">تونل “%s” با موفقیت ساخته شد</string>
     <string name="tunnel_error_already_exists">تونل “%s” از قبل وجود دارد</string>
     <string name="tunnel_error_invalid_name">نام نامعتبر</string>
-    <string name="tunnel_list_placeholder">به‌وسیله دکمه آبی یک تونل بیفزایید</string>
     <string name="tunnel_name">نام تونل</string>
     <string name="tunnel_on_error">روشن کردن تونل امکان پذیر نیست (wgTurnOn برگشت %d )</string>
+    <string name="tunnel_dns_failure">ناتوان در یافتن DNS نام میزبان: \"%s\"</string>
     <string name="tunnel_rename_error">ناتوان در تغییر نام تونل: %s</string>
     <string name="tunnel_rename_success">نام تونل با موفقیت تغییر یافت به “%s”</string>
     <string name="type_name_go_userspace">رفتن به فضای کاربر</string>
     <string name="type_name_kernel_module">واحد هسته</string>
     <string name="unknown_error">خطای نامشخص</string>
+    <string name="version_summary">%1$s بک اند %2$s</string>
     <string name="version_summary_checking">در حال بررسی نگارش پس‌زمینه %s</string>
     <string name="version_summary_unknown">نگارش %s ناشناخته</string>
     <string name="version_title">WireGuard برای اندروید نگارش %s</string>

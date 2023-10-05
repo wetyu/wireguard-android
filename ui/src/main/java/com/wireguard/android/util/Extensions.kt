@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,7 +25,7 @@ val Any.applicationScope: CoroutineScope
 
 val Preference.activity: SettingsActivity
     get() = context as? SettingsActivity
-            ?: throw IllegalStateException("Failed to resolve SettingsActivity")
+        ?: throw IllegalStateException("Failed to resolve SettingsActivity")
 
 val Preference.lifecycleScope: CoroutineScope
     get() = activity.lifecycleScope

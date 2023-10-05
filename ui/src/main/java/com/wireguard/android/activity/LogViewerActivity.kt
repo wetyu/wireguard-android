@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,6 +27,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.collection.CircularArray
 import androidx.core.app.ShareCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
@@ -40,6 +41,7 @@ import com.wireguard.android.R
 import com.wireguard.android.databinding.LogViewerActivityBinding
 import com.wireguard.android.util.DownloadsFileSaver
 import com.wireguard.android.util.ErrorMessages
+import com.wireguard.android.util.resolveAttribute
 import com.wireguard.crypto.KeyPair
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,8 +63,8 @@ import java.util.regex.Pattern
 class LogViewerActivity : AppCompatActivity() {
     private lateinit var binding: LogViewerActivityBinding
     private lateinit var logAdapter: LogEntryAdapter
-    private var logLines = arrayListOf<LogLine>()
-    private var rawLogLines = StringBuffer()
+    private var logLines = CircularArray<LogLine>()
+    private var rawLogLines = CircularArray<String>()
     private var recyclerView: RecyclerView? = null
     private var saveButton: MenuItem? = null
     private val year by lazy {
@@ -70,7 +72,7 @@ class LogViewerActivity : AppCompatActivity() {
         yearFormatter.format(Date())
     }
 
-    private val defaultColor by lazy { ResourcesCompat.getColor(resources, R.color.primary_text_color, theme) }
+    private val defaultColor by lazy { resolveAttribute(com.google.android.material.R.attr.colorOnSurface) }
 
     private val debugColor by lazy { ResourcesCompat.getColor(resources, R.color.debug_tag_color, theme) }
 
@@ -110,19 +112,21 @@ class LogViewerActivity : AppCompatActivity() {
         }
 
         binding.shareFab.setOnClickListener {
-            revokeLastUri()
-            val key = KeyPair().privateKey.toHex()
-            LOGS[key] = rawLogLines.toString().toByteArray(Charsets.UTF_8)
-            lastUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.exported-log/$key")
-            val shareIntent = ShareCompat.IntentBuilder(this)
+            lifecycleScope.launch {
+                revokeLastUri()
+                val key = KeyPair().privateKey.toHex()
+                LOGS[key] = rawLogBytes()
+                lastUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.exported-log/$key")
+                val shareIntent = ShareCompat.IntentBuilder(this@LogViewerActivity)
                     .setType("text/plain")
                     .setSubject(getString(R.string.log_export_subject))
                     .setStream(lastUri)
                     .setChooserTitle(R.string.log_export_title)
                     .createChooserIntent()
                     .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            grantUriPermission("android", lastUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            revokeLastActivityResultLauncher.launch(shareIntent)
+                grantUriPermission("android", lastUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                revokeLastActivityResultLauncher.launch(shareIntent)
+            }
         }
     }
 
@@ -138,16 +142,29 @@ class LogViewerActivity : AppCompatActivity() {
                 finish()
                 true
             }
+
             R.id.save_log -> {
                 saveButton?.isEnabled = false
                 lifecycleScope.launch { saveLog() }
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     private val downloadsFileSaver = DownloadsFileSaver(this)
+
+    private suspend fun rawLogBytes(): ByteArray {
+        val builder = StringBuilder()
+        withContext(Dispatchers.IO) {
+            for (i in 0 until rawLogLines.size()) {
+                builder.append(rawLogLines[i])
+                builder.append('\n')
+            }
+        }
+        return builder.toString().toByteArray(Charsets.UTF_8)
+    }
 
     private suspend fun saveLog() {
         var exception: Throwable? = null
@@ -155,7 +172,7 @@ class LogViewerActivity : AppCompatActivity() {
         withContext(Dispatchers.IO) {
             try {
                 outputFile = downloadsFileSaver.save("wireguard-log.txt", "text/plain", true)
-                outputFile?.outputStream?.write(rawLogLines.toString().toByteArray(Charsets.UTF_8))
+                outputFile?.outputStream?.write(rawLogBytes())
             } catch (e: Throwable) {
                 outputFile?.delete()
                 exception = e
@@ -164,12 +181,14 @@ class LogViewerActivity : AppCompatActivity() {
         saveButton?.isEnabled = true
         if (outputFile == null)
             return
-        Snackbar.make(findViewById(android.R.id.content),
-                if (exception == null) getString(R.string.log_export_success, outputFile?.fileName)
-                else getString(R.string.log_export_error, ErrorMessages[exception]),
-                if (exception == null) Snackbar.LENGTH_SHORT else Snackbar.LENGTH_LONG)
-                .setAnchorView(binding.shareFab)
-                .show()
+        Snackbar.make(
+            findViewById(android.R.id.content),
+            if (exception == null) getString(R.string.log_export_success, outputFile?.fileName)
+            else getString(R.string.log_export_error, ErrorMessages[exception]),
+            if (exception == null) Snackbar.LENGTH_SHORT else Snackbar.LENGTH_LONG
+        )
+            .setAnchorView(binding.shareFab)
+            .show()
     }
 
     private suspend fun streamingLog() = withContext(Dispatchers.IO) {
@@ -184,36 +203,60 @@ class LogViewerActivity : AppCompatActivity() {
                 return@withContext
             }
             val stdout = BufferedReader(InputStreamReader(process!!.inputStream, StandardCharsets.UTF_8))
-            var haveScrolled = false
-            val start = System.nanoTime()
-            var startPeriod = start
+
+            var posStart = 0
+            var timeLastNotify = System.nanoTime()
+            var priorModified = false
+            val bufferedLogLines = arrayListOf<LogLine>()
+            var timeout = 1000000000L / 2 // The timeout is initially small so that the view gets populated immediately.
+            val MAX_LINES = (1 shl 16) - 1
+            val MAX_BUFFERED_LINES = (1 shl 14) - 1
+
             while (true) {
                 val line = stdout.readLine() ?: break
-                rawLogLines.append(line)
-                rawLogLines.append('\n')
+                if (rawLogLines.size() >= MAX_LINES)
+                    rawLogLines.popFirst()
+                rawLogLines.addLast(line)
                 val logLine = parseLine(line)
-                withContext(Dispatchers.Main.immediate) {
-                    if (logLine != null) {
-                        recyclerView?.let {
-                            val shouldScroll = haveScrolled && !it.canScrollVertically(1)
-                            logLines.add(logLine)
-                            if (haveScrolled) logAdapter.notifyDataSetChanged()
-                            if (shouldScroll)
-                                it.scrollToPosition(logLines.size - 1)
-                        }
-                    } else {
-                        logLines.lastOrNull()?.msg += "\n$line"
-                        if (haveScrolled) logAdapter.notifyDataSetChanged()
+                if (logLine != null) {
+                    bufferedLogLines.add(logLine)
+                } else {
+                    if (bufferedLogLines.isNotEmpty()) {
+                        bufferedLogLines.last().msg += "\n$line"
+                    } else if (!logLines.isEmpty) {
+                        logLines[logLines.size() - 1].msg += "\n$line"
+                        priorModified = true
                     }
-                    if (!haveScrolled) {
-                        val end = System.nanoTime()
-                        val scroll = (end - start) > 1000000000L * 2.5 || !stdout.ready()
-                        if (logLines.isNotEmpty() && (scroll || (end - startPeriod) > 1000000000L / 4)) {
-                            logAdapter.notifyDataSetChanged()
-                            recyclerView?.scrollToPosition(logLines.size - 1)
-                            startPeriod = end
-                        }
-                        if (scroll) haveScrolled = true
+                }
+                val timeNow = System.nanoTime()
+                if (bufferedLogLines.size < MAX_BUFFERED_LINES && (timeNow - timeLastNotify) < timeout && stdout.ready())
+                    continue
+                timeout = 1000000000L * 5 / 2 // Increase the timeout after the initial view has something in it.
+                timeLastNotify = timeNow
+
+                withContext(Dispatchers.Main.immediate) {
+                    val isScrolledToBottomAlready = recyclerView?.canScrollVertically(1) == false
+                    if (priorModified) {
+                        logAdapter.notifyItemChanged(posStart - 1)
+                        priorModified = false
+                    }
+                    val fullLen = logLines.size() + bufferedLogLines.size
+                    if (fullLen >= MAX_LINES) {
+                        val numToRemove = fullLen - MAX_LINES + 1
+                        logLines.removeFromStart(numToRemove)
+                        logAdapter.notifyItemRangeRemoved(0, numToRemove)
+                        posStart -= numToRemove
+
+                    }
+                    for (bufferedLine in bufferedLogLines) {
+                        logLines.addLast(bufferedLine)
+                    }
+                    bufferedLogLines.clear()
+                    logAdapter.notifyItemRangeInserted(posStart, logLines.size() - posStart)
+                    posStart = logLines.size()
+
+                    if (isScrolledToBottomAlready) {
+                        recyclerView?.scrollToPosition(logLines.size() - 1)
                     }
                 }
             }
@@ -248,7 +291,8 @@ class LogViewerActivity : AppCompatActivity() {
          *
          * <pre>05-26 11:02:36.886 5689 5689 D AndroidRuntime: CheckJNI is OFF.</pre>
          */
-        private val THREADTIME_LINE: Pattern = Pattern.compile("^(\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3})(?:\\s+[0-9A-Za-z]+)?\\s+(\\d+)\\s+(\\d+)\\s+([A-Z])\\s+(.+?)\\s*: (.*)$")
+        private val THREADTIME_LINE: Pattern =
+            Pattern.compile("^(\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{3})(?:\\s+[0-9A-Za-z]+)?\\s+(\\d+)\\s+(\\d+)\\s+([A-Z])\\s+(.+?)\\s*: (.*)$")
         private val LOGS: MutableMap<String, ByteArray> = ConcurrentHashMap()
         private const val TAG = "WireGuard/LogViewerActivity"
     }
@@ -259,7 +303,7 @@ class LogViewerActivity : AppCompatActivity() {
 
         private fun levelToColor(level: String): Int {
             return when (level) {
-                "D" -> debugColor
+                "V", "D" -> debugColor
                 "E" -> errorColor
                 "I" -> infoColor
                 "W" -> warningColor
@@ -267,11 +311,11 @@ class LogViewerActivity : AppCompatActivity() {
             }
         }
 
-        override fun getItemCount() = logLines.size
+        override fun getItemCount() = logLines.size()
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.log_viewer_entry, parent, false)
+                .inflate(R.layout.log_viewer_entry, parent, false)
             return ViewHolder(view)
         }
 
@@ -282,8 +326,10 @@ class LogViewerActivity : AppCompatActivity() {
             else
                 SpannableString("${line.tag}: ${line.msg}").apply {
                     setSpan(StyleSpan(BOLD), 0, "${line.tag}:".length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    setSpan(ForegroundColorSpan(levelToColor(line.level)),
-                            0, "${line.tag}:".length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    setSpan(
+                        ForegroundColorSpan(levelToColor(line.level)),
+                        0, "${line.tag}:".length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
                 }
             holder.layout.apply {
                 findViewById<MaterialTextView>(R.id.log_date).text = line.time.toString()
@@ -305,11 +351,11 @@ class LogViewerActivity : AppCompatActivity() {
         override fun insert(uri: Uri, values: ContentValues?): Uri? = null
 
         override fun query(uri: Uri, projection: Array<out String>?, selection: String?, selectionArgs: Array<out String>?, sortOrder: String?): Cursor? =
-                logForUri(uri)?.let {
-                    val m = MatrixCursor(arrayOf(android.provider.OpenableColumns.DISPLAY_NAME, android.provider.OpenableColumns.SIZE), 1)
-                    m.addRow(arrayOf("wireguard-log.txt", it.size.toLong()))
-                    m
-                }
+            logForUri(uri)?.let {
+                val m = MatrixCursor(arrayOf(android.provider.OpenableColumns.DISPLAY_NAME, android.provider.OpenableColumns.SIZE), 1)
+                m.addRow(arrayOf("wireguard-log.txt", it.size.toLong()))
+                m
+            }
 
         override fun onCreate(): Boolean = true
 
@@ -319,7 +365,8 @@ class LogViewerActivity : AppCompatActivity() {
 
         override fun getType(uri: Uri): String? = logForUri(uri)?.let { "text/plain" }
 
-        override fun getStreamTypes(uri: Uri, mimeTypeFilter: String): Array<String>? = getType(uri)?.let { if (compareMimeTypes(it, mimeTypeFilter)) arrayOf(it) else null }
+        override fun getStreamTypes(uri: Uri, mimeTypeFilter: String): Array<String>? =
+            getType(uri)?.let { if (compareMimeTypes(it, mimeTypeFilter)) arrayOf(it) else null }
 
         override fun openFile(uri: Uri, mode: String): ParcelFileDescriptor? {
             if (mode != "r") return null

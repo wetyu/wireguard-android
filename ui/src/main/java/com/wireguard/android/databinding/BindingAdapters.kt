@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.databinding
@@ -23,6 +23,7 @@ import com.wireguard.android.R
 import com.wireguard.android.databinding.ObservableKeyedRecyclerViewAdapter.RowConfigurationHandler
 import com.wireguard.android.widget.ToggleSwitch
 import com.wireguard.android.widget.ToggleSwitch.OnBeforeCheckedChangeListener
+import com.wireguard.android.widget.TvCardView
 import com.wireguard.config.Attribute
 import com.wireguard.config.InetNetwork
 import java.net.InetAddress
@@ -46,9 +47,11 @@ object BindingAdapters {
 
     @JvmStatic
     @BindingAdapter("items", "layout", "fragment")
-    fun <E> setItems(view: LinearLayout,
-                     oldList: ObservableList<E>?, oldLayoutId: Int, @Suppress("UNUSED_PARAMETER") oldFragment: Fragment?,
-                     newList: ObservableList<E>?, newLayoutId: Int, newFragment: Fragment?) {
+    fun <E> setItems(
+        view: LinearLayout,
+        oldList: ObservableList<E>?, oldLayoutId: Int, @Suppress("UNUSED_PARAMETER") oldFragment: Fragment?,
+        newList: ObservableList<E>?, newLayoutId: Int, newFragment: Fragment?
+    ) {
         if (oldList === newList && oldLayoutId == newLayoutId)
             return
         var listener: ItemChangeListener<E>? = ListenerUtil.getListener(view, R.id.item_change_listener)
@@ -72,9 +75,11 @@ object BindingAdapters {
 
     @JvmStatic
     @BindingAdapter("items", "layout")
-    fun <E> setItems(view: LinearLayout,
-                     oldList: Iterable<E>?, oldLayoutId: Int,
-                     newList: Iterable<E>?, newLayoutId: Int) {
+    fun <E> setItems(
+        view: LinearLayout,
+        oldList: Iterable<E>?, oldLayoutId: Int,
+        newList: Iterable<E>?, newLayoutId: Int
+    ) {
         if (oldList === newList && oldLayoutId == newLayoutId)
             return
         view.removeAllViews()
@@ -92,11 +97,13 @@ object BindingAdapters {
 
     @JvmStatic
     @BindingAdapter(requireAll = false, value = ["items", "layout", "configurationHandler"])
-    fun <K, E : Keyed<out K>> setItems(view: RecyclerView,
-                                       oldList: ObservableKeyedArrayList<K, E>?, oldLayoutId: Int,
-                                       @Suppress("UNUSED_PARAMETER") oldRowConfigurationHandler: RowConfigurationHandler<*, *>?,
-                                       newList: ObservableKeyedArrayList<K, E>?, newLayoutId: Int,
-                                       newRowConfigurationHandler: RowConfigurationHandler<*, *>?) {
+    fun <K, E : Keyed<out K>> setItems(
+        view: RecyclerView,
+        oldList: ObservableKeyedArrayList<K, E>?, oldLayoutId: Int,
+        @Suppress("UNUSED_PARAMETER") oldRowConfigurationHandler: RowConfigurationHandler<*, *>?,
+        newList: ObservableKeyedArrayList<K, E>?, newLayoutId: Int,
+        newRowConfigurationHandler: RowConfigurationHandler<*, *>?
+    ) {
         if (view.layoutManager == null)
             view.layoutManager = LinearLayoutManager(view.context, RecyclerView.VERTICAL, false)
         if (oldList === newList && oldLayoutId == newLayoutId)
@@ -122,16 +129,20 @@ object BindingAdapters {
 
     @JvmStatic
     @BindingAdapter("onBeforeCheckedChanged")
-    fun setOnBeforeCheckedChanged(view: ToggleSwitch,
-                                  listener: OnBeforeCheckedChangeListener?) {
+    fun setOnBeforeCheckedChanged(
+        view: ToggleSwitch,
+        listener: OnBeforeCheckedChangeListener?
+    ) {
         view.setOnBeforeCheckedChangeListener(listener)
     }
 
     @JvmStatic
     @BindingAdapter("onFocusChange")
-    fun setOnFocusChange(view: EditText,
-                         listener: View.OnFocusChangeListener?) {
-        view.setOnFocusChangeListener(listener)
+    fun setOnFocusChange(
+        view: EditText,
+        listener: View.OnFocusChangeListener?
+    ) {
+        view.onFocusChangeListener = listener
     }
 
     @JvmStatic
@@ -167,5 +178,17 @@ object BindingAdapters {
         } catch (_: Throwable) {
             0
         }
+    }
+
+    @JvmStatic
+    @BindingAdapter("isUp")
+    fun setIsUp(card: TvCardView, up: Boolean) {
+        card.isUp = up
+    }
+
+    @JvmStatic
+    @BindingAdapter("isDeleting")
+    fun setIsDeleting(card: TvCardView, deleting: Boolean) {
+        card.isDeleting = deleting
     }
 }

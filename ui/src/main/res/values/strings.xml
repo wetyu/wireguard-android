@@ -108,6 +108,9 @@
     <string name="tv_select_a_storage_drive">Select a storage drive</string>
     <string name="tv_no_file_picker">Please install a file management utility to browse files</string>
     <string name="tv_add_tunnel_get_started">Add a tunnel to get started</string>
+    <string name="donate_title">♥ Donate to the WireGuard Project</string>
+    <string name="donate_summary">Every contribution helps</string>
+    <string name="donate_google_play_disappointment">Thank you for supporting the WireGuard Project!\n\nUnfortunately, due to Google\'s policies, we\'re not allowed to link to the part of the project webpage where you can make a donation. Hopefully you can figure this out!\n\nThanks again for your contribution.</string>
     <string name="disable_config_export_title">Disable config exporting</string>
     <string name="disable_config_export_description">Disabling config exporting makes private keys less accessible</string>
     <string name="dns_servers">DNS servers</string>
@@ -117,6 +120,7 @@
     <string name="error_down">Error bringing down tunnel: %s</string>
     <string name="error_fetching_apps">Error fetching apps list: %s</string>
     <string name="error_root">Please obtain root access and try again</string>
+    <string name="error_prepare">Error preparing tunnel: %s</string>
     <string name="error_up">Error bringing up tunnel: %s</string>
     <string name="exclude_private_ips">Exclude private IPs</string>
     <string name="generate_new_private_key">Generate new private key</string>
@@ -136,6 +140,8 @@
     <string name="key_length_explanation_base64">: WireGuard base64 keys must be 44 characters (32 bytes)</string>
     <string name="key_length_explanation_binary">: WireGuard keys must be 32 bytes</string>
     <string name="key_length_explanation_hex">: WireGuard hex keys must be 64 characters (32 bytes)</string>
+    <string name="latest_handshake">Latest handshake</string>
+    <string name="latest_handshake_ago">%s ago</string>
     <string name="listen_port">Listen port</string>
     <string name="log_export_error">Unable to export log: %s</string>
     <string name="log_export_subject">WireGuard Android Log File</string>
@@ -179,6 +185,10 @@
     <string name="private_key">Private key</string>
     <string name="public_key">Public key</string>
     <string name="qr_code_hint">Tip: generate with `qrencode -t ansiutf8 &lt; tunnel.conf`.</string>
+    <string name="quick_settings_tile_add_title">Add tile to quick settings panel</string>
+    <string name="quick_settings_tile_add_summary">The shortcut tile toggles the most recent tunnel</string>
+    <string name="quick_settings_tile_add_failure">Unable to add shortcut tile: error %d</string>
+    <string name="quick_settings_tile_action">Toggle tunnel</string>
     <string name="restore_on_boot_summary_off">Will not bring up enabled tunnels at boot</string>
     <string name="restore_on_boot_summary_on">Will bring up enabled tunnels at boot</string>
     <string name="restore_on_boot_title">Restore on boot</string>
@@ -214,7 +224,7 @@
     <string name="tunnel_create_success">Successfully created tunnel “%s”</string>
     <string name="tunnel_error_already_exists">Tunnel “%s” already exists</string>
     <string name="tunnel_error_invalid_name">Invalid name</string>
-    <string name="tunnel_list_placeholder">Add a tunnel using the blue button</string>
+    <string name="tunnel_list_placeholder">Add a tunnel using the button below</string>
     <string name="tunnel_name">Tunnel Name</string>
     <string name="tunnel_on_error">Unable to turn tunnel on (wgTurnOn returned %d)</string>
     <string name="tunnel_dns_failure">Unable to resolve DNS hostname: “%s”</string>
@@ -223,6 +233,16 @@
     <string name="type_name_go_userspace">Go userspace</string>
     <string name="type_name_kernel_module">Kernel module</string>
     <string name="unknown_error">Unknown error</string>
+    <string name="updater_avalable">An application update is available. Please update now.</string>
+    <string name="updater_action">Download &amp; Update</string>
+    <string name="updater_rechecking">Fetching update metadata…</string>
+    <string name="updater_download_progress">Downloading update: %1$s / %2$s (%3$.2f%%)</string>
+    <string name="updater_download_progress_nototal">Downloading update: %s</string>
+    <string name="updater_installing">Installing update…</string>
+    <string name="updater_failure">Update failure: %s. Will retry momentarily…</string>
+    <string name="updater_corrupt_title">Application Corrupt</string>
+    <string name="updater_corrupt_message">This application is corrupt. Please re-download the APK from the website linked below. After, uninstall this application, and reinstall it from the downloaded APK.</string>
+    <string name="updater_corrupt_navigate">Open Website</string>
     <string name="version_summary">%1$s backend %2$s</string>
     <string name="version_summary_checking">Checking %s backend version</string>
     <string name="version_summary_unknown">Unknown %s version</string>

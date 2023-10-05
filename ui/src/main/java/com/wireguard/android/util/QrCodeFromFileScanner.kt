@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2022 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -55,11 +55,13 @@ class QrCodeFromFileScanner(
                 multFactor = originalWidth.toFloat() / originalHeight.toFloat()
                 newWidth = (newHeight * multFactor).toInt()
             }
+
             originalWidth > originalHeight -> {
                 newWidth = scaledSize
                 multFactor = originalHeight.toFloat() / originalWidth.toFloat()
                 newHeight = (newWidth * multFactor).toInt()
             }
+
             originalHeight == originalWidth -> {
                 newHeight = scaledSize
                 newWidth = scaledSize

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.fragment
@@ -18,6 +18,9 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.os.BundleCompat
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.wireguard.android.Application
@@ -35,7 +38,7 @@ import kotlinx.coroutines.launch
 /**
  * Fragment for editing a WireGuard configuration.
  */
-class TunnelEditorFragment : BaseFragment() {
+class TunnelEditorFragment : BaseFragment(), MenuProvider {
     private var haveShownKeys = false
     private var binding: TunnelEditorFragmentBinding? = null
     private var tunnel: ObservableTunnel? = null
@@ -63,17 +66,14 @@ class TunnelEditorFragment : BaseFragment() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.config_editor, menu)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.config_editor, menu)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = TunnelEditorFragmentBinding.inflate(inflater, container, false)
         binding?.apply {
@@ -81,6 +81,11 @@ class TunnelEditorFragment : BaseFragment() {
             privateKeyTextLayout.setEndIconOnClickListener { config?.`interface`?.generateKeyPair() }
         }
         return binding?.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     override fun onDestroyView() {
@@ -95,8 +100,10 @@ class TunnelEditorFragment : BaseFragment() {
         val focusedView = activity.currentFocus
         if (focusedView != null) {
             val inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            inputManager?.hideSoftInputFromWindow(focusedView.windowToken,
-                    InputMethodManager.HIDE_NOT_ALWAYS)
+            inputManager?.hideSoftInputFromWindow(
+                focusedView.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS
+            )
         }
         parentFragmentManager.popBackStackImmediate()
 
@@ -105,8 +112,8 @@ class TunnelEditorFragment : BaseFragment() {
             selectedTunnel = tunnel
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_action_save) {
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        if (menuItem.itemId == R.id.menu_action_save) {
             binding ?: return false
             val newConfig = try {
                 binding!!.config!!.resolve()
@@ -130,6 +137,7 @@ class TunnelEditorFragment : BaseFragment() {
                             onTunnelCreated(null, e)
                         }
                     }
+
                     tunnel!!.name != binding!!.name -> {
                         Log.d(TAG, "Attempting to rename tunnel to " + binding!!.name)
                         try {
@@ -139,6 +147,7 @@ class TunnelEditorFragment : BaseFragment() {
                             onTunnelRenamed(tunnel!!, newConfig, e)
                         }
                     }
+
                     else -> {
                         Log.d(TAG, "Attempting to save config of " + tunnel!!.name)
                         try {
@@ -152,7 +161,7 @@ class TunnelEditorFragment : BaseFragment() {
             }
             return true
         }
-        return super.onOptionsItemSelected(item)
+        return false
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -194,8 +203,10 @@ class TunnelEditorFragment : BaseFragment() {
         super.onSaveInstanceState(outState)
     }
 
-    override fun onSelectedTunnelChanged(oldTunnel: ObservableTunnel?,
-                                         newTunnel: ObservableTunnel?) {
+    override fun onSelectedTunnelChanged(
+        oldTunnel: ObservableTunnel?,
+        newTunnel: ObservableTunnel?
+    ) {
         tunnel = newTunnel
         if (binding == null) return
         binding!!.config = ConfigProxy()
@@ -232,8 +243,10 @@ class TunnelEditorFragment : BaseFragment() {
         }
     }
 
-    private suspend fun onTunnelRenamed(renamedTunnel: ObservableTunnel, newConfig: Config,
-                                        throwable: Throwable?) {
+    private suspend fun onTunnelRenamed(
+        renamedTunnel: ObservableTunnel, newConfig: Config,
+        throwable: Throwable?
+    ) {
         val ctx = activity ?: Application.get()
         if (throwable == null) {
             val message = ctx.getString(R.string.tunnel_rename_success, renamedTunnel.name)
@@ -265,7 +278,7 @@ class TunnelEditorFragment : BaseFragment() {
             onSelectedTunnelChanged(null, selectedTunnel)
         } else {
             tunnel = selectedTunnel
-            val config: ConfigProxy = savedInstanceState.getParcelable(KEY_LOCAL_CONFIG)!!
+            val config = BundleCompat.getParcelable(savedInstanceState, KEY_LOCAL_CONFIG, ConfigProxy::class.java)!!
             val originalName = savedInstanceState.getString(KEY_ORIGINAL_NAME)
             if (tunnel != null && tunnel!!.name != originalName) onSelectedTunnelChanged(null, tunnel) else binding!!.config = config
         }
@@ -290,13 +303,15 @@ class TunnelEditorFragment : BaseFragment() {
                         haveShownKeys = true
                         showPrivateKey(edit)
                     }
+
                     is BiometricAuthenticator.Result.Failure -> {
                         Snackbar.make(
-                                binding!!.mainContainer,
-                                it.message,
-                                Snackbar.LENGTH_SHORT
+                            binding!!.mainContainer,
+                            it.message,
+                            Snackbar.LENGTH_SHORT
                         ).show()
                     }
+
                     is BiometricAuthenticator.Result.Cancelled -> {}
                 }
             }

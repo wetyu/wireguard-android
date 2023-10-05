@@ -1,6 +1,6 @@
 /*
  * Copyright © 2013 The Android Open Source Project
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.widget
@@ -8,9 +8,9 @@ package com.wireguard.android.widget
 import android.content.Context
 import android.os.Parcelable
 import android.util.AttributeSet
-import android.widget.Switch
+import com.google.android.material.materialswitch.MaterialSwitch
 
-class ToggleSwitch @JvmOverloads constructor(context: Context?, attrs: AttributeSet? = null) : Switch(context, attrs) {
+class ToggleSwitch @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : MaterialSwitch(context, attrs) {
     private var isRestoringState = false
     private var listener: OnBeforeCheckedChangeListener? = null
     override fun onRestoreInstanceState(state: Parcelable) {

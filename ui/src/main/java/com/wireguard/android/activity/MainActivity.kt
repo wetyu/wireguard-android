@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.activity
@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.appcompat.app.ActionBar
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -26,27 +28,29 @@ import com.wireguard.android.model.ObservableTunnel
 class MainActivity : BaseActivity(), FragmentManager.OnBackStackChangedListener {
     private var actionBar: ActionBar? = null
     private var isTwoPaneLayout = false
+    private var backPressedCallback: OnBackPressedCallback? = null
 
-    override fun onBackPressed() {
+    private fun handleBackPressed() {
         val backStackEntries = supportFragmentManager.backStackEntryCount
         // If the two-pane layout does not have an editor open, going back should exit the app.
         if (isTwoPaneLayout && backStackEntries <= 1) {
             finish()
             return
         }
-        // Deselect the current tunnel on navigating back from the detail pane to the one-pane list.
-        if (!isTwoPaneLayout && backStackEntries == 1) {
+
+        if (backStackEntries >= 1)
             supportFragmentManager.popBackStack()
+
+        // Deselect the current tunnel on navigating back from the detail pane to the one-pane list.
+        if (backStackEntries == 1)
             selectedTunnel = null
-            return
-        }
-        super.onBackPressed()
     }
 
     override fun onBackStackChanged() {
+        val backStackEntries = supportFragmentManager.backStackEntryCount
+        backPressedCallback?.isEnabled = backStackEntries >= 1
         if (actionBar == null) return
         // Do not show the home menu when the two-pane layout is at the detail view (see above).
-        val backStackEntries = supportFragmentManager.backStackEntryCount
         val minBackStackEntries = if (isTwoPaneLayout) 2 else 1
         actionBar!!.setDisplayHomeAsUpEnabled(backStackEntries >= minBackStackEntries)
     }
@@ -57,6 +61,7 @@ class MainActivity : BaseActivity(), FragmentManager.OnBackStackChangedListener 
         actionBar = supportActionBar
         isTwoPaneLayout = findViewById<View?>(R.id.master_detail_wrapper) != null
         supportFragmentManager.addOnBackStackChangedListener(this)
+        backPressedCallback = onBackPressedDispatcher.addCallback(this) { handleBackPressed() }
         onBackStackChanged()
     }
 
@@ -69,9 +74,10 @@ class MainActivity : BaseActivity(), FragmentManager.OnBackStackChangedListener 
         return when (item.itemId) {
             android.R.id.home -> {
                 // The back arrow in the action bar should act the same as the back button.
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
                 true
             }
+
             R.id.menu_action_edit -> {
                 supportFragmentManager.commit {
                     replace(R.id.detail_container, TunnelEditorFragment())
@@ -86,18 +92,25 @@ class MainActivity : BaseActivity(), FragmentManager.OnBackStackChangedListener 
                 startActivity(Intent(this, SettingsActivity::class.java))
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    override fun onSelectedTunnelChanged(oldTunnel: ObservableTunnel?,
-                                         newTunnel: ObservableTunnel?) {
+    override fun onSelectedTunnelChanged(
+        oldTunnel: ObservableTunnel?,
+        newTunnel: ObservableTunnel?
+    ): Boolean {
         val fragmentManager = supportFragmentManager
+        if (fragmentManager.isStateSaved) {
+            return false
+        }
+
         val backStackEntries = fragmentManager.backStackEntryCount
         if (newTunnel == null) {
             // Clear everything off the back stack (all editors and detail fragments).
             fragmentManager.popBackStackImmediate(0, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-            return
+            return true
         }
         if (backStackEntries == 2) {
             // Pop the editor off the back stack to reveal the detail fragment. Use the immediate
@@ -111,5 +124,6 @@ class MainActivity : BaseActivity(), FragmentManager.OnBackStackChangedListener 
                 addToBackStack(null)
             }
         }
+        return true
     }
 }

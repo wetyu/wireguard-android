@@ -66,6 +66,8 @@
     <string name="bad_config_reason_unknown_section">Bagian tak diketahui</string>
     <string name="bad_config_reason_value_out_of_range">Nilai di luar rentang</string>
     <string name="bad_extension_error">Berkas harus .conf atau .zip</string>
+    <string name="error_no_qr_found">Kode QR tidak ditemukan dalam gambar</string>
+    <string name="error_qr_checksum">Verifikasi ceksum kode QR gagal</string>
     <string name="cancel">Batalkan</string>
     <string name="config_delete_error">Tidak dapat menghapus berkas konfigurasi %s</string>
     <string name="config_exists_error">Sudah ada konfigurasi untuk “%s”</string>
@@ -95,6 +97,7 @@
     <string name="disable_config_export_title">Nonaktifkan ekspor konfigurasi</string>
     <string name="disable_config_export_description">Menonaktifkan ekspor konfigurasi akan membuat kunci pribadi sulit diakses</string>
     <string name="dns_servers">Server DNS</string>
+    <string name="dns_search_domains">Cari domain</string>
     <string name="edit">Edit</string>
     <string name="endpoint">Endpoint</string>
     <string name="error_down">Kesalahan pada tunel: %s</string>
@@ -197,7 +200,6 @@
     <string name="tunnel_create_success">Tunel “%s” Berhasil dibuat</string>
     <string name="tunnel_error_already_exists">Tunel “%s” sudah ada</string>
     <string name="tunnel_error_invalid_name">Nama tidak valid</string>
-    <string name="tunnel_list_placeholder">Tambahkan tunel menggunakan tombol +</string>
     <string name="tunnel_name">Nama tunel</string>
     <string name="tunnel_on_error">Tidak dapat mengaktifkan tunel (wgTurnOn %d dikembalikan)</string>
     <string name="tunnel_dns_failure">Tidak bisa mencari nama host DNS \"%s\"</string>

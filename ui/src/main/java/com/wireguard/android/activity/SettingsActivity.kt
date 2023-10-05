@@ -1,18 +1,22 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.activity
 
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.service.quicksettings.TileService
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.wireguard.android.Application
+import com.wireguard.android.QuickTileService
 import com.wireguard.android.R
 import com.wireguard.android.backend.WgQuickBackend
 import com.wireguard.android.preference.PreferencesPreferenceDataStore
@@ -24,7 +28,7 @@ import kotlinx.coroutines.withContext
 /**
  * Interface for changing application-global persistent settings.
  */
-class SettingsActivity : ThemeChangeAwareActivity() {
+class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (supportFragmentManager.findFragmentById(android.R.id.content) == null) {
@@ -46,7 +50,13 @@ class SettingsActivity : ThemeChangeAwareActivity() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, key: String?) {
             preferenceManager.preferenceDataStore = PreferencesPreferenceDataStore(lifecycleScope, Application.getPreferencesDataStore())
             addPreferencesFromResource(R.xml.preferences)
-            preferenceScreen.initialExpandedChildrenCount = 4
+            preferenceScreen.initialExpandedChildrenCount = 5
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || QuickTileService.isAdded) {
+                val quickTile = preferenceManager.findPreference<Preference>("quick_tile")
+                quickTile?.parent?.removePreference(quickTile)
+                --preferenceScreen.initialExpandedChildrenCount
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val darkTheme = preferenceManager.findPreference<Preference>("dark_theme")
                 darkTheme?.parent?.removePreference(darkTheme)
@@ -61,9 +71,9 @@ class SettingsActivity : ThemeChangeAwareActivity() {
                 zipExporter?.parent?.removePreference(zipExporter)
             }
             val wgQuickOnlyPrefs = arrayOf(
-                    preferenceManager.findPreference("tools_installer"),
-                    preferenceManager.findPreference("restore_on_boot"),
-                    preferenceManager.findPreference<Preference>("multiple_tunnels")
+                preferenceManager.findPreference("tools_installer"),
+                preferenceManager.findPreference("restore_on_boot"),
+                preferenceManager.findPreference<Preference>("multiple_tunnels")
             ).filterNotNull()
             wgQuickOnlyPrefs.forEach { it.isVisible = false }
             lifecycleScope.launch {

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -41,6 +41,12 @@ object UserKnobs {
             it[DARK_THEME] ?: false
         }
 
+    suspend fun setDarkTheme(on: Boolean) {
+        Application.getPreferencesDataStore().edit {
+            it[DARK_THEME] = on
+        }
+    }
+
     private val ALLOW_REMOTE_CONTROL_INTENTS = booleanPreferencesKey("allow_remote_control_intents")
     val allowRemoteControlIntents: Flow<Boolean>
         get() = Application.getPreferencesDataStore().data.map {
@@ -80,6 +86,36 @@ object UserKnobs {
                 it.remove(RUNNING_TUNNELS)
             else
                 it[RUNNING_TUNNELS] = runningTunnels
+        }
+    }
+
+    private val UPDATER_NEWER_VERSION_SEEN = stringPreferencesKey("updater_newer_version_seen")
+    val updaterNewerVersionSeen: Flow<String?>
+        get() = Application.getPreferencesDataStore().data.map {
+            it[UPDATER_NEWER_VERSION_SEEN]
+        }
+
+    suspend fun setUpdaterNewerVersionSeen(newerVersionSeen: String?) {
+        Application.getPreferencesDataStore().edit {
+            if (newerVersionSeen == null)
+                it.remove(UPDATER_NEWER_VERSION_SEEN)
+            else
+                it[UPDATER_NEWER_VERSION_SEEN] = newerVersionSeen
+        }
+    }
+
+    private val UPDATER_NEWER_VERSION_CONSENTED = stringPreferencesKey("updater_newer_version_consented")
+    val updaterNewerVersionConsented: Flow<String?>
+        get() = Application.getPreferencesDataStore().data.map {
+            it[UPDATER_NEWER_VERSION_CONSENTED]
+        }
+
+    suspend fun setUpdaterNewerVersionConsented(newerVersionConsented: String?) {
+        Application.getPreferencesDataStore().edit {
+            if (newerVersionConsented == null)
+                it.remove(UPDATER_NEWER_VERSION_CONSENTED)
+            else
+                it[UPDATER_NEWER_VERSION_CONSENTED] = newerVersionConsented
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2017-2021 WireGuard LLC. All Rights Reserved.
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.wireguard.android.fragment
@@ -67,12 +67,20 @@ abstract class BaseFragment : Fragment(), OnSelectedTunnelChangedListener {
         val activity = activity ?: return
         activity.lifecycleScope.launch {
             if (Application.getBackend() is GoBackend) {
-                val intent = GoBackend.VpnService.prepare(activity)
-                if (intent != null) {
-                    pendingTunnel = tunnel
-                    pendingTunnelUp = checked
-                    permissionActivityResultLauncher.launch(intent)
-                    return@launch
+                try {
+                    val intent = GoBackend.VpnService.prepare(activity)
+                    if (intent != null) {
+                        pendingTunnel = tunnel
+                        pendingTunnelUp = checked
+                        permissionActivityResultLauncher.launch(intent)
+                        return@launch
+                    }
+                } catch (e: Throwable) {
+                    val message = activity.getString(R.string.error_prepare, ErrorMessages[e])
+                    Snackbar.make(view, message, Snackbar.LENGTH_LONG)
+                        .setAnchorView(view.findViewById(R.id.create_fab))
+                        .show()
+                    Log.e(TAG, message, e)
                 }
             }
             setTunnelStateWithPermissionsResult(tunnel, checked)
@@ -91,8 +99,8 @@ abstract class BaseFragment : Fragment(), OnSelectedTunnelChangedListener {
                 val view = view
                 if (view != null)
                     Snackbar.make(view, message, Snackbar.LENGTH_LONG)
-                            .setAnchorView(view.findViewById(R.id.create_fab))
-                            .show()
+                        .setAnchorView(view.findViewById(R.id.create_fab))
+                        .show()
                 else
                     Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
                 Log.e(TAG, message, e)
